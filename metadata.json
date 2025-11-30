@@ -1,0 +1,7 @@
+{
+  "name": "CaffeWise",
+  "description": "一款科學的咖啡因管理系統，將看不見的代謝過程可視化，預測睡眠準備情況，並透過 AI 協助避免過量攝取。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
