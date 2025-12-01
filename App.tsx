@@ -13,6 +13,7 @@ import AddLogView from './components/AddLogView';
 import StatsView from './components/StatsView';
 import WikiView from './components/WikiView';
 import SettingsView from './components/SettingsView';
+import CalendarView from './components/CalendarView';
 
 // --- Main App Component ---
 
@@ -96,6 +97,14 @@ const App: React.FC = () => {
               status={status}
               onRemoveLog={removeLog}
               onUpdateLog={updateLog}
+              onOpenSettings={() => setCurrentTab(TabView.SETTINGS)}
+            />
+          )}
+
+          {currentTab === TabView.CALENDAR && (
+            <CalendarView 
+              logs={logs}
+              onRemoveLog={removeLog}
             />
           )}
 

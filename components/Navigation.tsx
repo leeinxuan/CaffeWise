@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { TabView } from '../types';
-import { LayoutDashboard, PlusCircle, BarChart2, BookOpen, Settings } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, BarChart2, BookOpen, CalendarDays } from 'lucide-react';
 
 interface NavigationProps {
   currentTab: TabView;
@@ -10,10 +11,10 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
   const navItems = [
     { tab: TabView.DASHBOARD, icon: LayoutDashboard, label: '儀表板' },
-    { tab: TabView.STATS, icon: BarChart2, label: '統計' },
+    { tab: TabView.CALENDAR, icon: CalendarDays, label: '咖啡紀錄' },
     { tab: TabView.ADD, icon: PlusCircle, label: '紀錄', special: true },
+    { tab: TabView.STATS, icon: BarChart2, label: '統計' },
     { tab: TabView.WIKI, icon: BookOpen, label: '百科' },
-    { tab: TabView.SETTINGS, icon: Settings, label: '設定' },
   ];
 
   return (

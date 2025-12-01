@@ -18,6 +18,7 @@ export interface UserSettings {
 
 export enum TabView {
   DASHBOARD = 'DASHBOARD',
+  CALENDAR = 'CALENDAR',
   ADD = 'ADD',
   STATS = 'STATS',
   WIKI = 'WIKI',

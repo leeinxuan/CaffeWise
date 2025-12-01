@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Coffee, Trash2, Edit2, X, AlertCircle } from 'lucide-react';
+import { Coffee, Trash2, Edit2, X, AlertCircle, Settings } from 'lucide-react';
 import { CaffeineLog, UserSettings } from '../types';
 import { SYMPTOMS_LIST } from '../constants';
 import MetabolicGauge from './MetabolicGauge';
@@ -15,6 +15,7 @@ interface DashboardViewProps {
   status: 'safe' | 'warning' | 'danger';
   onRemoveLog: (id: string) => void;
   onUpdateLog: (id: string, updates: Partial<CaffeineLog>) => void;
+  onOpenSettings: () => void;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({ 
@@ -24,9 +25,19 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   sleepClearTime, 
   status,
   onRemoveLog,
-  onUpdateLog
+  onUpdateLog,
+  onOpenSettings
 }) => {
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
+
+  // Filter logs to show only today's activity
+  const todayLogs = logs.filter(log => {
+    const logDate = new Date(log.timestamp);
+    const today = new Date();
+    return logDate.getDate() === today.getDate() &&
+           logDate.getMonth() === today.getMonth() &&
+           logDate.getFullYear() === today.getFullYear();
+  });
 
   return (
     <div className="space-y-6 pb-24 animate-fade-in">
@@ -37,6 +48,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
           <p className="text-xs text-slate-400">代謝監測中</p>
         </div>
+        <button 
+          onClick={onOpenSettings}
+          className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
+        >
+          <Settings size={20} />
+        </button>
       </header>
 
       {/* Main Gauge */}
@@ -62,12 +79,12 @@ const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Sleep Forecast */}
       <SleepForecast clearTime={sleepClearTime} bedtime={settings.bedtime} />
 
-      {/* Recent Activity */}
+      {/* Today's Activity */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider">近期攝取紀錄</h3>
+        <h3 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider">今日攝取紀錄</h3>
         <div className="space-y-3">
-          {logs.length === 0 && <p className="text-slate-500 text-sm italic">今日尚無紀錄。</p>}
-          {logs.slice(0, 5).map(log => (
+          {todayLogs.length === 0 && <p className="text-slate-500 text-sm italic">今日尚無紀錄。</p>}
+          {todayLogs.map(log => (
             <div key={log.id} className="bg-slate-800 p-3 rounded-lg border border-slate-700">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-3">
