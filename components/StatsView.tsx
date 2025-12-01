@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { TrendingUp, Clock, Award } from 'lucide-react';
+import { TrendingUp, Clock, Award, BarChart2 } from 'lucide-react';
 import { CaffeineLog } from '../types';
 
 interface StatsViewProps {
@@ -85,7 +85,10 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
   return (
     <div className="pb-24 space-y-6 animate-fade-in">
       <header className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">統計分析</h2>
+          <div className="flex items-center gap-2">
+            <BarChart2 className="text-indigo-400" size={24} />
+            <h2 className="text-xl font-bold text-white">統計分析</h2>
+          </div>
           <div className="flex bg-slate-800 rounded-lg p-1">
               <button 
                  onClick={() => setStatsPeriod('week')}

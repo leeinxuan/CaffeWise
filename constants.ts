@@ -1,5 +1,13 @@
 import { BrandItem } from "./types";
 
+export const SYMPTOMS_LIST = [
+  { id: 'tremor', label: '手抖', icon: '👋' },
+  { id: 'palpitation', label: '心悸', icon: '💓' },
+  { id: 'headache', label: '頭痛', icon: '🤕' },
+  { id: 'insomnia', label: '失眠', icon: '🥱' },
+  { id: 'resistance', label: '抵抗力強', icon: '🛡️' }
+];
+
 export const BRAND_DATABASE: BrandItem[] = [
   {
     name: "星巴克 (Starbucks)",

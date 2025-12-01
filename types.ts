@@ -4,6 +4,7 @@ export interface CaffeineLog {
   amountMg: number; // Initial amount ingested
   timestamp: number; // Unix timestamp
   source: 'manual' | 'brand' | 'ai';
+  symptoms?: string[];
 }
 
 export interface UserSettings {

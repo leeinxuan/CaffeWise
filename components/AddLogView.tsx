@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
-import { Database, Keyboard, Sparkles, ChevronLeft, ChevronRight, Zap, Camera } from 'lucide-react';
+import { Database, Keyboard, Sparkles, ChevronLeft, ChevronRight, Zap, Camera, AlertTriangle } from 'lucide-react';
 import { BrandItem, CaffeineLog } from '../types';
-import { BRAND_DATABASE } from '../constants';
+import { BRAND_DATABASE, SYMPTOMS_LIST } from '../constants';
 import { analyzeImageForCaffeine } from '../services/geminiService';
 
 interface AddLogViewProps {
-  onAddLog: (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number) => void;
+  onAddLog: (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number, symptoms?: string[]) => void;
 }
 
 const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
@@ -36,19 +37,54 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
 
+  // Symptoms State
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+
+  // Helper Component: Symptom Selector
+  const SymptomSelector = () => (
+    <div className="bg-blue-900/10 p-4 rounded-xl border border-blue-500/30 shadow-inner">
+      <h4 className="text-xs text-blue-300 font-bold uppercase mb-3 flex items-center gap-1">
+        <AlertTriangle size={14} className="text-blue-400" />
+        標記身體反應 (選填)
+      </h4>
+      <div className="flex flex-wrap gap-2">
+        {SYMPTOMS_LIST.map(sym => {
+          const isSelected = selectedSymptoms.includes(sym.id);
+          return (
+            <button
+              key={sym.id}
+              onClick={() => {
+                if (isSelected) setSelectedSymptoms(prev => prev.filter(id => id !== sym.id));
+                else setSelectedSymptoms(prev => [...prev, sym.id]);
+              }}
+              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all flex items-center gap-1 ${
+                isSelected 
+                  ? 'bg-red-500 text-white border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.4)]' 
+                  : 'bg-slate-800 border-slate-600 text-slate-300 hover:border-slate-400'
+              }`}
+            >
+              <span className="text-base">{sym.icon}</span>
+              {sym.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   // --- Handlers ---
 
   const handleManualSubmit = () => {
     const timestamp = new Date(drinkTime).getTime();
     const name = manualName || (volumeMl ? `飲品 (${volumeMl}ml)` : '手動紀錄');
-    onAddLog(name, Number(manualAmount), 'manual', timestamp);
+    onAddLog(name, Number(manualAmount), 'manual', timestamp, selectedSymptoms);
   };
 
   const handleFormulaSubmit = () => {
     const mg = Math.round(Number(beanWeight) * Number(caffeinePercentage) * 10);
     const timestamp = new Date(drinkTime).getTime();
     const name = manualName || '手沖咖啡';
-    onAddLog(name, mg, 'manual', timestamp);
+    onAddLog(name, mg, 'manual', timestamp, selectedSymptoms);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +112,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
       {addTab === 'menu' && (
         <div className="grid gap-4 animate-fade-in">
            <button 
-             onClick={() => setAddTab('brand')}
+             onClick={() => { setAddTab('brand'); setSelectedSymptoms([]); }}
              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500 rounded-2xl p-6 text-left transition-all group shadow-lg"
            >
               <div className="flex items-start gap-4">
@@ -91,7 +127,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
            </button>
 
            <button 
-             onClick={() => setAddTab('manual')}
+             onClick={() => { setAddTab('manual'); setSelectedSymptoms([]); }}
              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500 rounded-2xl p-6 text-left transition-all group shadow-lg"
            >
               <div className="flex items-start gap-4">
@@ -106,7 +142,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
            </button>
 
            <button 
-             onClick={() => { setAddTab('ai'); setScanResult(null); }}
+             onClick={() => { setAddTab('ai'); setScanResult(null); setSelectedSymptoms([]); }}
              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500 rounded-2xl p-6 text-left transition-all group shadow-lg"
            >
               <div className="flex items-start gap-4">
@@ -183,7 +219,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                     </div>
                   </div>
                 ) : (
-                  // Level 3: Select Size & Time (Action)
+                  // Level 3: Select Size & Time & Symptoms
                   <div className="animate-fade-in">
                     <button 
                       onClick={() => setSelectedDrink(null)}
@@ -200,7 +236,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                       </div>
                       
                       <div className="p-4 grid gap-4">
-                          {/* Drink Time Picker for Brand Mode */}
+                          {/* Drink Time */}
                           <div>
                             <label className="text-xs text-slate-400 font-bold uppercase block mb-2 ml-1">飲用時間</label>
                             <input 
@@ -210,17 +246,20 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                               className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-indigo-500 outline-none appearance-none transition-colors"
                             />
                           </div>
+
+                          {/* Symptom Selector */}
+                          <SymptomSelector />
                           
                           <div className="h-px bg-slate-700/50 my-1"></div>
                           
-                          <label className="text-xs text-slate-400 font-bold uppercase block ml-1">選擇容量</label>
+                          <label className="text-xs text-slate-400 font-bold uppercase block ml-1">選擇容量 (點擊即新增)</label>
                           <div className="grid gap-3">
                             {selectedDrink.sizes.map(size => (
                               <button
                                 key={size.label}
                                 onClick={() => {
                                   const timestamp = new Date(brandDrinkTime).getTime();
-                                  onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand', timestamp);
+                                  onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand', timestamp, selectedSymptoms);
                                 }}
                                 className="flex items-center justify-between p-4 bg-slate-700/50 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/20 rounded-xl border border-slate-600 hover:border-indigo-400 transition-all duration-300 group"
                               >
@@ -324,6 +363,9 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                           </div>
                       </div>
 
+                      {/* Symptom Selector */}
+                      <SymptomSelector />
+
                       <button 
                         disabled={!manualAmount}
                         onClick={handleManualSubmit}
@@ -402,6 +444,9 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                             />
                         </div>
                     </div>
+
+                    {/* Symptom Selector */}
+                    <SymptomSelector />
                     
                     <button 
                       disabled={!beanWeight}
@@ -447,6 +492,12 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                       </div>
                       <p className="text-3xl font-bold text-indigo-400 mb-2">{scanResult.estimatedMg} mg</p>
                       <p className="text-xs text-slate-400 mb-4 leading-relaxed">{scanResult.reasoning}</p>
+                      
+                      {/* Symptom Selector */}
+                      <div className="mb-4">
+                        <SymptomSelector />
+                      </div>
+
                       <div className="flex gap-2">
                         <button 
                           onClick={() => setScanResult(null)}
@@ -455,7 +506,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                           重試
                         </button>
                         <button 
-                          onClick={() => onAddLog(scanResult.drinkName, scanResult.estimatedMg, 'ai')}
+                          onClick={() => onAddLog(scanResult.drinkName, scanResult.estimatedMg, 'ai', undefined, selectedSymptoms)}
                           className="flex-1 py-3 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition"
                         >
                           確認新增

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
 
@@ -53,16 +52,21 @@ const App: React.FC = () => {
 
   // --- Handlers ---
 
-  const addLog = (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number) => {
+  const addLog = (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number, symptoms?: string[]) => {
     const newLog: CaffeineLog = {
       id: Date.now().toString(),
       name,
       amountMg,
       timestamp: customTimestamp || Date.now(),
-      source
+      source,
+      symptoms: symptoms || []
     };
     setLogs(prev => [newLog, ...prev]);
     setCurrentTab(TabView.DASHBOARD);
+  };
+
+  const updateLog = (id: string, updates: Partial<CaffeineLog>) => {
+    setLogs(prev => prev.map(log => log.id === id ? { ...log, ...updates } : log));
   };
 
   const removeLog = (id: string) => {
@@ -95,6 +99,7 @@ const App: React.FC = () => {
               sleepClearTime={sleepClearTime}
               status={status}
               onRemoveLog={removeLog}
+              onUpdateLog={updateLog}
               onSOS={() => setCurrentTab(TabView.SOS)}
             />
           )}
