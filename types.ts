@@ -25,7 +25,7 @@ export enum TabView {
 
 export interface BrandItem {
   name: string;
-  items: { name: string; sizes: { label: string; mg: number }[] }[];
+  items: { name: string; sizes: { label: string; mg: number; ml: number }[] }[];
 }
 
 export interface AIAnalysisResult {

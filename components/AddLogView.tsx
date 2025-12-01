@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Database, Keyboard, Sparkles, ChevronLeft, ChevronRight, Zap, Camera } from 'lucide-react';
 import { BrandItem, CaffeineLog } from '../types';
@@ -16,6 +15,10 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
   // Brand Mode State
   const [selectedBrand, setSelectedBrand] = useState<BrandItem | null>(null);
   const [selectedDrink, setSelectedDrink] = useState<BrandItem['items'][0] | null>(null);
+  const [brandDrinkTime, setBrandDrinkTime] = useState(() => {
+    const now = new Date();
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  });
   
   // Manual Mode State
   const [manualMode, setManualMode] = useState<'general' | 'formula'>('general');
@@ -180,7 +183,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                     </div>
                   </div>
                 ) : (
-                  // Level 3: Select Size (Action)
+                  // Level 3: Select Size & Time (Action)
                   <div className="animate-fade-in">
                     <button 
                       onClick={() => setSelectedDrink(null)}
@@ -196,17 +199,39 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                           </div>
                       </div>
                       
-                      <div className="p-4 grid gap-3">
-                          {selectedDrink.sizes.map(size => (
-                            <button
-                              key={size.label}
-                              onClick={() => onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand')}
-                              className="flex items-center justify-between p-4 bg-slate-700/50 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/20 rounded-xl border border-slate-600 hover:border-indigo-400 transition-all duration-300 group"
-                            >
-                              <span className="font-medium text-slate-200 group-hover:text-white">{size.label}</span>
-                              <span className="font-bold text-indigo-300 group-hover:text-white text-lg">{size.mg} <span className="text-sm font-normal opacity-70">mg</span></span>
-                            </button>
-                          ))}
+                      <div className="p-4 grid gap-4">
+                          {/* Drink Time Picker for Brand Mode */}
+                          <div>
+                            <label className="text-xs text-slate-400 font-bold uppercase block mb-2 ml-1">飲用時間</label>
+                            <input 
+                              type="datetime-local"
+                              value={brandDrinkTime}
+                              onChange={(e) => setBrandDrinkTime(e.target.value)}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-indigo-500 outline-none appearance-none transition-colors"
+                            />
+                          </div>
+                          
+                          <div className="h-px bg-slate-700/50 my-1"></div>
+                          
+                          <label className="text-xs text-slate-400 font-bold uppercase block ml-1">選擇容量</label>
+                          <div className="grid gap-3">
+                            {selectedDrink.sizes.map(size => (
+                              <button
+                                key={size.label}
+                                onClick={() => {
+                                  const timestamp = new Date(brandDrinkTime).getTime();
+                                  onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand', timestamp);
+                                }}
+                                className="flex items-center justify-between p-4 bg-slate-700/50 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/20 rounded-xl border border-slate-600 hover:border-indigo-400 transition-all duration-300 group"
+                              >
+                                <div className="flex flex-col text-left">
+                                  <span className="font-medium text-slate-200 group-hover:text-white">{size.label}</span>
+                                  <span className="text-xs text-slate-400 group-hover:text-indigo-200">約 {size.ml} ml</span>
+                                </div>
+                                <span className="font-bold text-indigo-300 group-hover:text-white text-lg">{size.mg} <span className="text-sm font-normal opacity-70">mg</span></span>
+                              </button>
+                            ))}
+                          </div>
                       </div>
                     </div>
                   </div>

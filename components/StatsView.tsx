@@ -1,10 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { 
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  PieChart, Pie, Legend
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { TrendingUp, Clock, Award, PieChart as PieChartIcon } from 'lucide-react';
+import { TrendingUp, Clock, Award } from 'lucide-react';
 import { CaffeineLog } from '../types';
 
 interface StatsViewProps {
@@ -70,18 +69,7 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
       return slots;
   }, [periodLogs]);
 
-  // 5. Source Preference (Pie)
-  const sourceData = useMemo(() => {
-      const counts = { brand: 0, manual: 0, ai: 0 };
-      periodLogs.forEach(l => counts[l.source]++);
-      return [
-          { name: '品牌', value: counts.brand, color: '#f59e0b' }, // Amber
-          { name: '手動', value: counts.manual, color: '#6366f1' }, // Indigo
-          { name: 'AI', value: counts.ai, color: '#a855f7' }, // Purple
-      ].filter(d => d.value > 0);
-  }, [periodLogs]);
-
-  // 6. Top Drinks
+  // 5. Top Drinks
   const topDrinks = useMemo(() => {
       const countMap = new Map<string, number>();
       periodLogs.forEach(l => {
@@ -187,69 +175,26 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
          </div>
       </div>
 
-      {/* Preferences (Row) */}
-      <div className="grid grid-cols-1 gap-4">
-          
-          {/* Top Items */}
-          <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-              <div className="flex items-center gap-2 mb-4">
-                  <Award size={16} className="text-amber-400" />
-                  <h3 className="text-sm font-medium text-slate-200">最常喝的飲品</h3>
-              </div>
-              <div className="space-y-3">
-                  {topDrinks.length > 0 ? topDrinks.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-sm">
-                          <div className="flex items-center gap-3">
-                              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 text-slate-300 text-xs font-bold">
-                                  {idx + 1}
-                              </span>
-                              <span className="text-slate-300">{item[0]}</span>
-                          </div>
-                          <span className="text-slate-500">{item[1]} 次</span>
-                      </div>
-                  )) : (
-                      <p className="text-xs text-slate-500 text-center py-4">資料不足</p>
-                  )}
-              </div>
+      {/* Top Drinks List */}
+      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+          <div className="flex items-center gap-2 mb-4">
+              <Award size={16} className="text-amber-400" />
+              <h3 className="text-sm font-medium text-slate-200">最常喝的飲品</h3>
           </div>
-
-          {/* Source Pie */}
-          <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-              <div className="flex items-center gap-2 mb-2">
-                  <PieChartIcon size={16} className="text-purple-400" />
-                  <h3 className="text-sm font-medium text-slate-200">紀錄來源偏好</h3>
-              </div>
-              <div className="h-40 flex items-center justify-center">
-                  {sourceData.length > 0 ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                              <Pie
-                                  data={sourceData}
-                                  cx="50%"
-                                  cy="50%"
-                                  innerRadius={40}
-                                  outerRadius={60}
-                                  paddingAngle={5}
-                                  dataKey="value"
-                              >
-                                  {sourceData.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={entry.color} />
-                                  ))}
-                              </Pie>
-                              <Legend 
-                                  verticalAlign="middle" 
-                                  align="right" 
-                                  layout="vertical"
-                                  iconSize={8}
-                                  formatter={(value) => <span className="text-xs text-slate-400 ml-1">{value}</span>}
-                              />
-                              <Tooltip contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', fontSize: '12px' }} />
-                          </PieChart>
-                      </ResponsiveContainer>
-                  ) : (
-                      <p className="text-xs text-slate-500">資料不足</p>
-                  )}
-              </div>
+          <div className="space-y-3">
+              {topDrinks.length > 0 ? topDrinks.map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-3">
+                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 text-slate-300 text-xs font-bold">
+                              {idx + 1}
+                          </span>
+                          <span className="text-slate-300">{item[0]}</span>
+                      </div>
+                      <span className="text-slate-500">{item[1]} 次</span>
+                  </div>
+              )) : (
+                  <p className="text-xs text-slate-500 text-center py-4">資料不足</p>
+              )}
           </div>
       </div>
     </div>
