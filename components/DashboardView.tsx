@@ -15,7 +15,6 @@ interface DashboardViewProps {
   status: 'safe' | 'warning' | 'danger';
   onRemoveLog: (id: string) => void;
   onUpdateLog: (id: string, updates: Partial<CaffeineLog>) => void;
-  onSOS: () => void;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({ 
@@ -25,8 +24,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   sleepClearTime, 
   status,
   onRemoveLog,
-  onUpdateLog,
-  onSOS
+  onUpdateLog
 }) => {
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
 
@@ -39,9 +37,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
           <p className="text-xs text-slate-400">代謝監測中</p>
         </div>
-        <button onClick={onSOS} className="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs font-bold border border-red-500/20 hover:bg-red-500/20 transition">
-          SOS 救援
-        </button>
       </header>
 
       {/* Main Gauge */}

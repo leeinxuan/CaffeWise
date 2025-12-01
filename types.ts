@@ -1,3 +1,4 @@
+
 export interface CaffeineLog {
   id: string;
   name: string;
@@ -20,8 +21,7 @@ export enum TabView {
   ADD = 'ADD',
   STATS = 'STATS',
   WIKI = 'WIKI',
-  SETTINGS = 'SETTINGS',
-  SOS = 'SOS'
+  SETTINGS = 'SETTINGS'
 }
 
 export interface BrandItem {

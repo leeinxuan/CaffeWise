@@ -42,9 +42,9 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
 
   // Helper Component: Symptom Selector
   const SymptomSelector = () => (
-    <div className="bg-blue-900/10 p-4 rounded-xl border border-blue-500/30 shadow-inner">
-      <h4 className="text-xs text-blue-300 font-bold uppercase mb-3 flex items-center gap-1">
-        <AlertTriangle size={14} className="text-blue-400" />
+    <div className="bg-slate-800 p-4 rounded-xl border border-indigo-500/40 shadow-md">
+      <h4 className="text-xs text-indigo-300 font-bold uppercase mb-3 flex items-center gap-1">
+        <AlertTriangle size={14} className="text-indigo-400" />
         標記身體反應 (選填)
       </h4>
       <div className="flex flex-wrap gap-2">
@@ -60,7 +60,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
               className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all flex items-center gap-1 ${
                 isSelected 
                   ? 'bg-red-500 text-white border-red-400 shadow-[0_0_10px_rgba(239,68,68,0.4)]' 
-                  : 'bg-slate-800 border-slate-600 text-slate-300 hover:border-slate-400'
+                  : 'bg-slate-900 border-slate-600 text-slate-300 hover:border-slate-400 hover:bg-slate-800'
               }`}
             >
               <span className="text-base">{sym.icon}</span>

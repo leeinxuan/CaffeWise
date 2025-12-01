@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
 
@@ -7,7 +8,6 @@ import { calculateCurrentLevel, predictClearanceTime } from './utils/caffeineMat
 
 // Components
 import Navigation from './components/Navigation';
-import BreathingExercise from './components/BreathingExercise';
 import DashboardView from './components/DashboardView';
 import AddLogView from './components/AddLogView';
 import StatsView from './components/StatsView';
@@ -82,10 +82,6 @@ const App: React.FC = () => {
 
   // --- Main Render ---
 
-  if (currentTab === TabView.SOS) {
-    return <BreathingExercise onClose={() => setCurrentTab(TabView.DASHBOARD)} />;
-  }
-
   return (
     <HashRouter>
       <div className="min-h-screen bg-slate-900 text-slate-50 p-6 selection:bg-indigo-500/30">
@@ -100,7 +96,6 @@ const App: React.FC = () => {
               status={status}
               onRemoveLog={removeLog}
               onUpdateLog={updateLog}
-              onSOS={() => setCurrentTab(TabView.SOS)}
             />
           )}
 

@@ -3,8 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
-import { TrendingUp, Clock, Award, BarChart2 } from 'lucide-react';
+import { TrendingUp, Clock, Award, BarChart2, Sparkles, AlertTriangle, Activity } from 'lucide-react';
 import { CaffeineLog } from '../types';
+import { SYMPTOMS_LIST } from '../constants';
 
 interface StatsViewProps {
   logs: CaffeineLog[];
@@ -23,6 +24,72 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
   const periodLogs = useMemo(() => {
       return logs.filter(l => l.timestamp >= startTime);
   }, [logs, startTime]);
+
+  // --- AI Health Insights Logic ---
+  const healthInsights = useMemo(() => {
+    // Check all logs (not just period) for better data points
+    const symptomLogs = logs.filter(l => l.symptoms && l.symptoms.length > 0);
+    
+    if (symptomLogs.length < 1) return null;
+
+    // A. Dose Correlation: Avg Mg when symptoms occur vs when they don't
+    const avgSymptomMg = Math.round(symptomLogs.reduce((acc, l) => acc + l.amountMg, 0) / symptomLogs.length);
+    
+    const nonSymptomLogs = logs.filter(l => !l.symptoms || l.symptoms.length === 0);
+    const avgSafeMg = nonSymptomLogs.length > 0 
+      ? Math.round(nonSymptomLogs.reduce((acc, l) => acc + l.amountMg, 0) / nonSymptomLogs.length) 
+      : 0;
+
+    // B. Time Correlation: When do symptoms mostly happen?
+    const timeCount = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+    symptomLogs.forEach(l => {
+      const h = new Date(l.timestamp).getHours();
+      if (h >= 6 && h < 12) timeCount.morning++;
+      else if (h >= 12 && h < 18) timeCount.afternoon++;
+      else if (h >= 18 && h <= 23) timeCount.evening++;
+      else timeCount.night++;
+    });
+    
+    // Find risky time key
+    let riskyTime = 'afternoon';
+    let maxCount = -1;
+    (Object.keys(timeCount) as Array<keyof typeof timeCount>).forEach(key => {
+        if (timeCount[key] > maxCount) {
+            maxCount = timeCount[key];
+            riskyTime = key;
+        }
+    });
+    
+    const timeLabels: Record<string, string> = { morning: '早晨', afternoon: '下午', evening: '晚上', night: '深夜' };
+
+    // C. Top Symptom
+    const symMap = new Map<string, number>();
+    symptomLogs.flatMap(l => l.symptoms).forEach(s => {
+        if (s) symMap.set(s, (symMap.get(s) || 0) + 1);
+    });
+    const topSymptomId = [...symMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+    const topSymptomLabel = SYMPTOMS_LIST.find(s => s.id === topSymptomId)?.label || '不適';
+
+    // D. Generate Recommendation
+    let recommendation = "";
+    if (avgSymptomMg > avgSafeMg + 30) {
+        recommendation = `數據顯示當單次攝取接近 ${avgSymptomMg}mg 時，您容易感到${topSymptomLabel}。建議將單次攝取控制在 ${avgSafeMg}mg 左右以保持舒適。`;
+    } else if (riskyTime === 'evening' || riskyTime === 'night') {
+        recommendation = `您的${topSymptomLabel}症狀多發生在${timeLabels[riskyTime]}。建議您嘗試在下午 2 點前完成最後一杯咖啡。`;
+    } else {
+        recommendation = `您最近數次出現${topSymptomLabel}反應，建議每喝一杯咖啡多補充 200ml 水分，幫助代謝。`;
+    }
+
+    return {
+        avgSymptomMg,
+        avgSafeMg,
+        riskyTimeLabel: timeLabels[riskyTime],
+        topSymptomLabel,
+        recommendation,
+        symptomCount: symptomLogs.length
+    };
+  }, [logs]);
+
 
   // 2. Data for Trend Chart (Daily Total)
   const trendData = useMemo(() => {
@@ -199,6 +266,48 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
                   <p className="text-xs text-slate-500 text-center py-4">資料不足</p>
               )}
           </div>
+      </div>
+
+      {/* --- AI Health Insights Card --- */}
+      {/* Moved to bottom and made permanent to ensure visibility */}
+      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 p-5 rounded-2xl border border-indigo-500/50 shadow-lg relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                <Sparkles size={100} className="text-white" />
+            </div>
+            
+            <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="text-yellow-400" size={20} />
+                <h3 className="text-lg font-bold text-white">AI 健康洞察</h3>
+            </div>
+            
+            {healthInsights ? (
+                <>
+                    <p className="text-sm text-indigo-100 leading-relaxed mb-4 border-l-2 border-yellow-400 pl-3">
+                        {healthInsights.recommendation}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                        <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
+                            <div className="text-[10px] text-slate-400 uppercase mb-1 flex items-center gap-1">
+                                <AlertTriangle size={10} /> 發生不適平均值
+                            </div>
+                            <div className="text-xl font-bold text-red-400">{healthInsights.avgSymptomMg} <span className="text-xs">mg</span></div>
+                        </div>
+                        <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
+                            <div className="text-[10px] text-slate-400 uppercase mb-1 flex items-center gap-1">
+                                <Activity size={10} /> 安全舒適平均值
+                            </div>
+                            <div className="text-xl font-bold text-green-400">{healthInsights.avgSafeMg > 0 ? healthInsights.avgSafeMg : '-'} <span className="text-xs">mg</span></div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="bg-slate-900/40 p-4 rounded-xl border border-dashed border-slate-600 text-center relative z-10">
+                    <p className="text-xs text-indigo-200 leading-relaxed">
+                        目前數據不足。請在紀錄時標記「身體反應」(如手抖、失眠)，AI 將為您分析個人代謝規律與安全閾值。
+                    </p>
+                </div>
+            )}
       </div>
     </div>
   );
