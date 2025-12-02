@@ -12,11 +12,27 @@ interface AddLogBrandProps {
 const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
   const [selectedBrand, setSelectedBrand] = useState<BrandItem | null>(null);
   const [selectedDrink, setSelectedDrink] = useState<BrandItem['items'][0] | null>(null);
+  const [selectedSize, setSelectedSize] = useState<{ label: string; mg: number; ml: number } | null>(null);
+  
   const [brandDrinkTime, setBrandDrinkTime] = useState(() => {
     const now = new Date();
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   });
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+
+  // Helper to handle adding the log
+  const handleConfirmAdd = () => {
+    if (!selectedBrand || !selectedDrink || !selectedSize) return;
+
+    const timestamp = new Date(brandDrinkTime).getTime();
+    onAddLog(
+      `${selectedBrand.name} ${selectedDrink.name}`, 
+      selectedSize.mg, 
+      'brand', 
+      timestamp, 
+      selectedSymptoms
+    );
+  };
 
   // Level 1: Brand Selection
   if (!selectedBrand) {
@@ -57,7 +73,10 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
             {selectedBrand.items.map(item => (
               <button
                 key={item.name}
-                onClick={() => setSelectedDrink(item)}
+                onClick={() => {
+                  setSelectedDrink(item);
+                  setSelectedSize(null); // Reset size when picking a new drink
+                }}
                 className="w-full flex justify-between items-center p-5 hover:bg-stone-50 transition text-left group"
               >
                   <span className="text-sm font-medium text-stone-700 group-hover:text-[#5D4037] transition">{item.name}</span>
@@ -82,7 +101,7 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
       >
         <ChevronLeft size={16} /> 返回飲品列表
       </button>
-      <div className="bg-white rounded-3xl border border-stone-100 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-stone-100 overflow-hidden shadow-sm mb-20">
         <div className="p-5 border-b border-stone-100 bg-stone-50/50">
             <div className="flex flex-col">
               <span className="text-xs text-stone-400 mb-1">{selectedBrand.name}</span>
@@ -110,25 +129,40 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
             
             <div className="h-px bg-stone-100 my-1"></div>
             
-            <label className="text-xs text-stone-400 font-bold uppercase block ml-1">選擇容量 (點擊即新增)</label>
+            <label className="text-xs text-stone-400 font-bold uppercase block ml-1">選擇容量</label>
             <div className="grid gap-3">
-              {selectedDrink.sizes.map(size => (
-                <button
-                  key={size.label}
-                  onClick={() => {
-                    const timestamp = new Date(brandDrinkTime).getTime();
-                    onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand', timestamp, selectedSymptoms);
-                  }}
-                  className="flex items-center justify-between p-4 bg-stone-50 hover:bg-[#6F4E37] hover:shadow-lg hover:shadow-[#6F4E37]/20 rounded-2xl border border-stone-200 hover:border-[#6F4E37] transition-all duration-300 group"
-                >
-                  <div className="flex flex-col text-left">
-                    <span className="font-medium text-stone-700 group-hover:text-white">{size.label}</span>
-                    <span className="text-xs text-stone-400 group-hover:text-white/80">約 {size.ml} ml</span>
-                  </div>
-                  <span className="font-bold text-[#8D6E63] group-hover:text-white text-lg">{size.mg} <span className="text-sm font-normal opacity-70">mg</span></span>
-                </button>
-              ))}
+              {selectedDrink.sizes.map(size => {
+                const isSelected = selectedSize?.label === size.label;
+                return (
+                  <button
+                    key={size.label}
+                    onClick={() => setSelectedSize(size)}
+                    className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 group
+                      ${isSelected 
+                        ? 'bg-[#6F4E37] border-[#6F4E37] shadow-lg shadow-[#6F4E37]/20' 
+                        : 'bg-stone-50 border-stone-200 hover:border-[#8D6E63] hover:bg-white'}
+                    `}
+                  >
+                    <div className="flex flex-col text-left">
+                      <span className={`font-medium ${isSelected ? 'text-white' : 'text-stone-700'}`}>{size.label}</span>
+                      <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-stone-400'}`}>約 {size.ml} ml</span>
+                    </div>
+                    <span className={`font-bold text-lg ${isSelected ? 'text-white' : 'text-[#8D6E63]'}`}>
+                      {size.mg} <span className="text-sm font-normal opacity-70">mg</span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            
+            {/* Confirm Button */}
+            <button 
+              disabled={!selectedSize}
+              onClick={handleConfirmAdd}
+              className="w-full bg-[#6F4E37] disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20 mt-2"
+            >
+              確認新增
+            </button>
         </div>
       </div>
     </div>

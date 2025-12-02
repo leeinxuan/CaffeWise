@@ -42,7 +42,19 @@ const App: React.FC = () => {
   // Update Metabolic Level Timer
   useEffect(() => {
     const update = () => {
-      const level = calculateCurrentLevel(logs, settings.halfLifeHours);
+      const now = Date.now();
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      // Filter logs to ensure accuracy:
+      // 1. Only count logs from today (startOfDay)
+      // 2. Only count logs that have already happened (<= now)
+      const todaysRelevantLogs = logs.filter(log => 
+        log.timestamp >= startOfDay.getTime() && 
+        log.timestamp <= now
+      );
+
+      const level = calculateCurrentLevel(todaysRelevantLogs, settings.halfLifeHours);
       setCurrentLevel(level);
     };
     update();
