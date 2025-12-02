@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
@@ -153,19 +152,19 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
     <div className="pb-24 space-y-6 animate-fade-in">
       <header className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <BarChart2 className="text-indigo-400" size={24} />
-            <h2 className="text-xl font-bold text-white">統計分析</h2>
+            <BarChart2 className="text-[#8D6E63]" size={24} />
+            <h2 className="text-xl font-bold text-[#6F4E37]">統計分析</h2>
           </div>
-          <div className="flex bg-slate-800 rounded-lg p-1">
+          <div className="flex bg-stone-200 rounded-lg p-1">
               <button 
                  onClick={() => setStatsPeriod('week')}
-                 className={`px-3 py-1 text-xs font-medium rounded transition ${statsPeriod === 'week' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400'}`}
+                 className={`px-3 py-1 text-xs font-medium rounded-md transition ${statsPeriod === 'week' ? 'bg-white text-[#6F4E37] shadow-sm' : 'text-stone-500'}`}
               >
                   7 天
               </button>
               <button 
                  onClick={() => setStatsPeriod('month')}
-                 className={`px-3 py-1 text-xs font-medium rounded transition ${statsPeriod === 'month' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400'}`}
+                 className={`px-3 py-1 text-xs font-medium rounded-md transition ${statsPeriod === 'month' ? 'bg-white text-[#6F4E37] shadow-sm' : 'text-stone-500'}`}
               >
                   30 天
               </button>
@@ -174,49 +173,49 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
       
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
-          <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-              <div className="text-slate-400 text-[10px] uppercase mb-1">週期總量</div>
-              <div className="text-xl font-bold text-white">{totalIntake}</div>
-              <div className="text-[10px] text-slate-500">mg</div>
+          <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm text-center">
+              <div className="text-stone-400 text-[10px] uppercase mb-1">週期總量</div>
+              <div className="text-xl font-bold text-stone-800">{totalIntake}</div>
+              <div className="text-[10px] text-stone-400">mg</div>
           </div>
-          <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-              <div className="text-slate-400 text-[10px] uppercase mb-1">平均每日</div>
-              <div className="text-xl font-bold text-indigo-400">{avgIntake}</div>
-              <div className="text-[10px] text-slate-500">mg</div>
+          <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm text-center">
+              <div className="text-stone-400 text-[10px] uppercase mb-1">平均每日</div>
+              <div className="text-xl font-bold text-[#8D6E63]">{avgIntake}</div>
+              <div className="text-[10px] text-stone-400">mg</div>
           </div>
-          <div className="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
-              <div className="text-slate-400 text-[10px] uppercase mb-1">單次最高</div>
-              <div className="text-xl font-bold text-amber-400">{maxRecord}</div>
-              <div className="text-[10px] text-slate-500">mg</div>
+          <div className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm text-center">
+              <div className="text-stone-400 text-[10px] uppercase mb-1">單次最高</div>
+              <div className="text-xl font-bold text-amber-600">{maxRecord}</div>
+              <div className="text-[10px] text-stone-400">mg</div>
           </div>
       </div>
 
       {/* Trend Chart */}
-      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <div className="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm">
          <div className="flex items-center gap-2 mb-4">
-             <TrendingUp size={16} className="text-indigo-400" />
-             <h3 className="text-sm font-medium text-slate-200">攝取趨勢圖 (mg)</h3>
+             <TrendingUp size={16} className="text-[#8D6E63]" />
+             <h3 className="text-sm font-bold text-stone-700">攝取趨勢圖 (mg)</h3>
          </div>
          <div className="h-56 w-full">
            <ResponsiveContainer width="100%" height="100%">
              <BarChart data={trendData}>
                <XAxis 
                   dataKey="date" 
-                  stroke="#64748b" 
+                  stroke="#a8a29e" 
                   fontSize={10} 
                   tickFormatter={(val, index) => {
                       if (statsPeriod === 'month' && index % 5 !== 0) return '';
                       return val;
                   }}
                />
-               <YAxis stroke="#64748b" fontSize={10} width={30} />
+               <YAxis stroke="#a8a29e" fontSize={10} width={30} />
                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#f8fafc', fontSize: '12px' }} 
-                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                  contentStyle={{ backgroundColor: '#fff', borderColor: '#e7e5e4', color: '#44403c', fontSize: '12px', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} 
+                  cursor={{fill: '#f5f5f4'}}
                />
                <Bar dataKey="mg" radius={[4, 4, 0, 0]}>
                   {trendData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.mg > dailyLimitMg ? '#ef4444' : '#6366f1'} />
+                    <Cell key={`cell-${index}`} fill={entry.mg > dailyLimitMg ? '#ef4444' : '#8D6E63'} />
                   ))}
                </Bar>
              </BarChart>
@@ -225,85 +224,84 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
       </div>
 
       {/* Habits (Time Distribution) */}
-      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <div className="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-             <Clock size={16} className="text-blue-400" />
-             <h3 className="text-sm font-medium text-slate-200">時段習慣分析</h3>
+             <Clock size={16} className="text-[#8D6E63]" />
+             <h3 className="text-sm font-bold text-stone-700">時段習慣分析</h3>
          </div>
          <div className="h-48 w-full">
            <ResponsiveContainer width="100%" height="100%">
              <BarChart data={timeDistData} layout="vertical">
                <XAxis type="number" hide />
-               <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={11} width={80} />
+               <YAxis dataKey="name" type="category" stroke="#78716c" fontSize={11} width={80} />
                <Tooltip 
-                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', fontSize: '12px' }}
+                  cursor={{fill: '#f5f5f4'}}
+                  contentStyle={{ backgroundColor: '#fff', borderColor: '#e7e5e4', fontSize: '12px', borderRadius: '8px' }}
                />
-               <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+               <Bar dataKey="count" fill="#D7CCC8" radius={[0, 4, 4, 0]} barSize={20} />
              </BarChart>
            </ResponsiveContainer>
          </div>
       </div>
 
       {/* Top Drinks List */}
-      <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <div className="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-              <Award size={16} className="text-amber-400" />
-              <h3 className="text-sm font-medium text-slate-200">最常喝的飲品</h3>
+              <Award size={16} className="text-[#8D6E63]" />
+              <h3 className="text-sm font-bold text-stone-700">最常喝的飲品</h3>
           </div>
           <div className="space-y-3">
               {topDrinks.length > 0 ? topDrinks.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-sm">
                       <div className="flex items-center gap-3">
-                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-700 text-slate-300 text-xs font-bold">
+                          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-stone-100 text-stone-500 text-xs font-bold">
                               {idx + 1}
                           </span>
-                          <span className="text-slate-300">{item[0]}</span>
+                          <span className="text-stone-700 font-medium">{item[0]}</span>
                       </div>
-                      <span className="text-slate-500">{item[1]} 次</span>
+                      <span className="text-stone-400">{item[1]} 次</span>
                   </div>
               )) : (
-                  <p className="text-xs text-slate-500 text-center py-4">資料不足</p>
+                  <p className="text-xs text-stone-400 text-center py-4">資料不足</p>
               )}
           </div>
       </div>
 
       {/* --- AI Health Insights Card --- */}
-      {/* Moved to bottom and made permanent to ensure visibility */}
-      <div className="bg-gradient-to-br from-indigo-900 to-slate-900 p-5 rounded-2xl border border-indigo-500/50 shadow-lg relative overflow-hidden group">
+      <div className="bg-gradient-to-br from-[#6F4E37] to-[#5D4037] p-6 rounded-3xl shadow-lg relative overflow-hidden group text-white">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
                 <Sparkles size={100} className="text-white" />
             </div>
             
             <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="text-yellow-400" size={20} />
-                <h3 className="text-lg font-bold text-white">AI 健康洞察</h3>
+                <Sparkles className="text-amber-200" size={20} />
+                <h3 className="text-lg font-bold">AI 健康洞察</h3>
             </div>
             
             {healthInsights ? (
                 <>
-                    <p className="text-sm text-indigo-100 leading-relaxed mb-4 border-l-2 border-yellow-400 pl-3">
+                    <p className="text-sm text-stone-100 leading-relaxed mb-4 border-l-2 border-amber-300 pl-3">
                         {healthInsights.recommendation}
                     </p>
 
                     <div className="grid grid-cols-2 gap-3 mt-4">
-                        <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
-                            <div className="text-[10px] text-slate-400 uppercase mb-1 flex items-center gap-1">
+                        <div className="bg-black/20 rounded-xl p-3 border border-white/10">
+                            <div className="text-[10px] text-stone-300 uppercase mb-1 flex items-center gap-1">
                                 <AlertTriangle size={10} /> 發生不適平均值
                             </div>
-                            <div className="text-xl font-bold text-red-400">{healthInsights.avgSymptomMg} <span className="text-xs">mg</span></div>
+                            <div className="text-xl font-bold text-red-200">{healthInsights.avgSymptomMg} <span className="text-xs">mg</span></div>
                         </div>
-                        <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/50">
-                            <div className="text-[10px] text-slate-400 uppercase mb-1 flex items-center gap-1">
+                        <div className="bg-black/20 rounded-xl p-3 border border-white/10">
+                            <div className="text-[10px] text-stone-300 uppercase mb-1 flex items-center gap-1">
                                 <Activity size={10} /> 安全舒適平均值
                             </div>
-                            <div className="text-xl font-bold text-green-400">{healthInsights.avgSafeMg > 0 ? healthInsights.avgSafeMg : '-'} <span className="text-xs">mg</span></div>
+                            <div className="text-xl font-bold text-green-200">{healthInsights.avgSafeMg > 0 ? healthInsights.avgSafeMg : '-'} <span className="text-xs">mg</span></div>
                         </div>
                     </div>
                 </>
             ) : (
-                <div className="bg-slate-900/40 p-4 rounded-xl border border-dashed border-slate-600 text-center relative z-10">
-                    <p className="text-xs text-indigo-200 leading-relaxed">
+                <div className="bg-white/10 p-4 rounded-xl border border-dashed border-white/30 text-center relative z-10">
+                    <p className="text-xs text-stone-200 leading-relaxed">
                         目前數據不足。請在紀錄時標記「身體反應」(如手抖、失眠)，AI 將為您分析個人代謝規律與安全閾值。
                     </p>
                 </div>

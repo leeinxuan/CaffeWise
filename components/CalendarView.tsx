@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Coffee, Trash2, CalendarDays } from 'lucide-react';
 import { CaffeineLog } from '../types';
@@ -92,24 +91,24 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
     <div className="pb-24 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <CalendarDays className="text-indigo-400" size={24} />
-        <h2 className="text-xl font-bold text-white">咖啡紀錄</h2>
+        <CalendarDays className="text-[#8D6E63]" size={24} />
+        <h2 className="text-xl font-bold text-[#6F4E37]">咖啡紀錄</h2>
       </div>
 
       {/* Calendar Card */}
-      <div className="bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-700">
+      <div className="bg-white rounded-3xl p-5 shadow-lg shadow-stone-200/50 border border-stone-100">
         
         {/* Month Navigation */}
-        <div className="flex justify-between items-center mb-4 px-2">
-           <h3 className="text-lg font-bold text-white">
+        <div className="flex justify-between items-center mb-6 px-2">
+           <h3 className="text-lg font-bold text-stone-800">
              {year}年 {month + 1}月
            </h3>
-           <div className="flex gap-1">
-             <button onClick={prevMonth} className="p-1 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition">
-               <ChevronLeft size={20} />
+           <div className="flex gap-2">
+             <button onClick={prevMonth} className="p-1 hover:bg-stone-100 rounded-full text-stone-400 hover:text-stone-700 transition">
+               <ChevronLeft size={22} />
              </button>
-             <button onClick={nextMonth} className="p-1 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition">
-               <ChevronRight size={20} />
+             <button onClick={nextMonth} className="p-1 hover:bg-stone-100 rounded-full text-stone-400 hover:text-stone-700 transition">
+               <ChevronRight size={22} />
              </button>
            </div>
         </div>
@@ -117,14 +116,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
         {/* Weekday Header */}
         <div className="grid grid-cols-7 mb-2 text-center">
           {weekDays.map(d => (
-            <div key={d} className="text-xs text-slate-500 font-medium py-1">
+            <div key={d} className="text-xs text-stone-400 font-medium py-1">
               {d}
             </div>
           ))}
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-y-2">
+        <div className="grid grid-cols-7 gap-y-3">
            {allCalendarDays.map((dateObj, idx) => {
              const isSelected = dateObj.type === 'current' && 
                                 selectedDate.getDate() === dateObj.day && 
@@ -139,17 +138,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
                  <button
                    onClick={() => handleDayClick(dateObj.day, dateObj.type)}
                    className={`
-                     w-9 h-9 rounded-full flex items-center justify-center text-sm relative transition-all
+                     w-9 h-9 rounded-full flex items-center justify-center text-sm relative transition-all font-medium
                      ${isSelected 
-                        ? 'bg-orange-500 text-white font-bold shadow-lg shadow-orange-500/30' 
+                        ? 'bg-[#6F4E37] text-white shadow-lg shadow-[#6F4E37]/30' 
                         : isCurrentMonth 
-                          ? 'text-slate-300 hover:bg-slate-700' 
-                          : 'text-slate-600'}
+                          ? 'text-stone-700 hover:bg-stone-100' 
+                          : 'text-stone-300'}
                    `}
                  >
                    {dateObj.day}
                    {hasLogs && !isSelected && (
-                     <span className="absolute bottom-1 w-1 h-1 bg-orange-500 rounded-full"></span>
+                     <span className="absolute bottom-1.5 w-1 h-1 bg-[#8D6E63] rounded-full"></span>
                    )}
                  </button>
                </div>
@@ -160,12 +159,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
 
       {/* Selected Date Details */}
       <div className="space-y-3">
-         <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 flex justify-between items-center">
+         <div className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex justify-between items-center">
             <div>
-               <h4 className="text-orange-400 font-bold text-sm">
+               <h4 className="text-orange-900 font-bold text-sm">
                  {selectedDate.getMonth() + 1}月{selectedDate.getDate()}日 {weekDays[selectedDate.getDay()]}
                </h4>
-               <p className="text-xs text-slate-400 mt-1">
+               <p className="text-xs text-orange-700/70 mt-1">
                  這天有 {selectedDayLogs.length} 個紀錄，總計咖啡因 {selectedDayTotal} 毫克。
                </p>
             </div>
@@ -174,23 +173,23 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
          <div className="space-y-2">
             {selectedDayLogs.length > 0 ? (
               selectedDayLogs.map(log => (
-                <div key={log.id} className="bg-slate-800 p-3 rounded-xl border border-slate-700 flex justify-between items-center">
+                <div key={log.id} className="bg-white p-4 rounded-2xl border border-stone-100 shadow-sm flex justify-between items-center">
                    <div className="flex items-center gap-3">
-                      <div className="bg-slate-700/50 p-2 rounded-lg">
-                        <Coffee size={18} className="text-slate-400" />
+                      <div className="bg-stone-50 p-2 rounded-full border border-stone-100">
+                        <Coffee size={18} className="text-[#8D6E63]" />
                       </div>
                       <div>
-                         <div className="text-sm font-bold text-white">{log.name}</div>
-                         <div className="text-xs text-slate-500">
+                         <div className="text-sm font-bold text-stone-700">{log.name}</div>
+                         <div className="text-xs text-stone-400">
                             {new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
                          </div>
                       </div>
                    </div>
                    <div className="flex items-center gap-3">
-                      <span className="text-orange-400 font-bold text-sm">{log.amountMg} <span className="text-xs font-normal text-slate-500">mg</span></span>
+                      <span className="text-[#6F4E37] font-bold text-sm">{log.amountMg} <span className="text-xs font-normal text-stone-400">mg</span></span>
                       <button 
                         onClick={() => onRemoveLog(log.id)}
-                        className="text-slate-600 hover:text-red-400 transition"
+                        className="text-stone-300 hover:text-red-400 transition"
                       >
                          <Trash2 size={16} />
                       </button>
@@ -198,9 +197,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ logs, onRemoveLog }) => {
                 </div>
               ))
             ) : (
-               <div className="text-center py-8 opacity-50">
-                  <Coffee size={32} className="mx-auto mb-2 text-slate-600" />
-                  <p className="text-sm text-slate-500">這天沒有喝咖啡</p>
+               <div className="text-center py-10 opacity-50">
+                  <Coffee size={32} className="mx-auto mb-2 text-stone-300" />
+                  <p className="text-sm text-stone-400">這天沒有喝咖啡</p>
                </div>
             )}
          </div>

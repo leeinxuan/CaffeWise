@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Zap, Camera } from 'lucide-react';
 import { CaffeineLog } from '../../types';
@@ -34,53 +33,55 @@ const AddLogAI: React.FC<AddLogAIProps> = ({ onAddLog }) => {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <h3 className="text-sm text-slate-400 font-semibold flex items-center gap-2">
-          <Zap size={16} className="text-yellow-400" /> AI 智慧鏡頭 (Gemini 2.5)
+      <h3 className="text-sm text-stone-500 font-semibold flex items-center gap-2">
+          <Zap size={16} className="text-amber-500" /> AI 智慧鏡頭 (Gemini 2.5)
       </h3>
       
       {!scanResult ? (
-        <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-700 border-dashed rounded-xl cursor-pointer bg-slate-800/50 hover:bg-slate-800 transition">
+        <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-stone-300 border-dashed rounded-3xl cursor-pointer bg-white hover:bg-stone-50 transition">
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 {isScanning ? (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6F4E37]"></div>
                 ) : (
                   <>
-                    <Camera className="w-10 h-10 text-slate-400 mb-3" />
-                    <p className="text-sm text-slate-400">拍攝菜單或營養標示</p>
+                    <Camera className="w-12 h-12 text-stone-300 mb-3" />
+                    <p className="text-sm text-stone-500 font-medium">拍攝菜單或營養標示</p>
                   </>
                 )}
             </div>
             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isScanning} />
         </label>
       ) : (
-        <div className="bg-slate-800 p-4 rounded-xl border border-indigo-500/50 animate-fade-in">
+        <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-lg animate-fade-in">
             <div className="flex justify-between items-start mb-2">
-              <h4 className="font-bold text-white text-lg">{scanResult.drinkName}</h4>
-              <span className="text-xs bg-indigo-900 text-indigo-200 px-2 py-0.5 rounded">
+              <h4 className="font-bold text-stone-800 text-lg">{scanResult.drinkName}</h4>
+              <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium border border-amber-100">
                 {scanResult.confidence} 可信度
               </span>
             </div>
-            <p className="text-3xl font-bold text-indigo-400 mb-2">{scanResult.estimatedMg} mg</p>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed">{scanResult.reasoning}</p>
+            <p className="text-3xl font-bold text-[#6F4E37] mb-2">{scanResult.estimatedMg} mg</p>
+            <p className="text-xs text-stone-500 mb-6 leading-relaxed bg-stone-50 p-3 rounded-xl">
+               AI 分析：{scanResult.reasoning}
+            </p>
             
             {/* Symptom Selector */}
-            <div className="mb-4">
+            <div className="mb-6">
               <SymptomSelector 
                 selectedSymptoms={selectedSymptoms} 
                 onChange={setSelectedSymptoms} 
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button 
                 onClick={() => { setScanResult(null); setSelectedSymptoms([]); }}
-                className="flex-1 py-3 text-sm text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition"
+                className="flex-1 py-3 text-sm font-medium text-stone-600 bg-stone-100 rounded-xl hover:bg-stone-200 transition"
               >
                 重試
               </button>
               <button 
                 onClick={() => onAddLog(scanResult.drinkName, scanResult.estimatedMg, 'ai', undefined, selectedSymptoms)}
-                className="flex-1 py-3 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition"
+                className="flex-1 py-3 text-sm font-bold text-white bg-[#6F4E37] rounded-xl hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
               >
                 確認新增
               </button>

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { TabView } from '../types';
-import { LayoutDashboard, PlusCircle, BarChart2, BookOpen, CalendarDays } from 'lucide-react';
+import { Bean, PlusCircle, BarChart2, BookOpen, CalendarDays } from 'lucide-react';
 
 interface NavigationProps {
   currentTab: TabView;
@@ -10,7 +9,7 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
   const navItems = [
-    { tab: TabView.DASHBOARD, icon: LayoutDashboard, label: '儀表板' },
+    { tab: TabView.DASHBOARD, icon: Bean, label: '代謝狀態' },
     { tab: TabView.CALENDAR, icon: CalendarDays, label: '咖啡紀錄' },
     { tab: TabView.ADD, icon: PlusCircle, label: '紀錄', special: true },
     { tab: TabView.STATS, icon: BarChart2, label: '統計' },
@@ -18,7 +17,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg border-t border-slate-800 pb-safe z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-stone-200 pb-safe z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
       <div className="flex justify-around items-center px-2 py-3">
         {navItems.map((item) => {
           const isActive = currentTab === item.tab;
@@ -29,7 +28,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
               <button
                 key={item.tab}
                 onClick={() => setTab(item.tab)}
-                className="relative -top-5 bg-gradient-to-tr from-indigo-600 to-purple-600 p-4 rounded-full shadow-lg shadow-indigo-500/30 border-4 border-slate-900 transform transition active:scale-95"
+                className="relative -top-6 bg-[#6F4E37] p-4 rounded-full shadow-xl shadow-[#6F4E37]/40 transform transition active:scale-95 flex items-center justify-center"
               >
                 <Icon size={28} className="text-white" />
               </button>
@@ -41,7 +40,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
               key={item.tab}
               onClick={() => setTab(item.tab)}
               className={`flex flex-col items-center gap-1 min-w-[60px] transition-colors ${
-                isActive ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-300'
+                isActive ? 'text-[#6F4E37]' : 'text-stone-400 hover:text-stone-600'
               }`}
             >
               <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />

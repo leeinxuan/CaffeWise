@@ -14,20 +14,18 @@ const MetabolicGauge: React.FC<MetabolicGaugeProps> = ({ currentMg, limitMg, sta
   const circumference = normalizedRadius * 2 * Math.PI;
   
   // Calculate stroke dash offset
-  // We want to show how much is "filled" relative to a safe max (e.g. 400mg)
-  // But logically, "Full" means high caffeine.
   const percentage = Math.min(100, (currentMg / limitMg) * 100);
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-  let color = '#22c55e'; // Green
-  let glowColor = 'rgba(34, 197, 94, 0.5)';
+  let color = '#65a30d'; // Lime 600
+  let glowColor = 'rgba(101, 163, 13, 0.2)';
   
   if (status === 'warning') {
-    color = '#f97316'; // Orange
-    glowColor = 'rgba(249, 115, 22, 0.5)';
+    color = '#ea580c'; // Orange 600
+    glowColor = 'rgba(234, 88, 12, 0.2)';
   } else if (status === 'danger') {
-    color = '#ef4444'; // Red
-    glowColor = 'rgba(239, 68, 68, 0.5)';
+    color = '#dc2626'; // Red 600
+    glowColor = 'rgba(220, 38, 38, 0.2)';
   }
 
   return (
@@ -37,9 +35,9 @@ const MetabolicGauge: React.FC<MetabolicGaugeProps> = ({ currentMg, limitMg, sta
         width={radius * 2}
         className="rotate-[-90deg] transition-all duration-1000 ease-out"
       >
-        {/* Background Circle */}
+        {/* Background Circle - Light Stone */}
         <circle
-          stroke="#334155"
+          stroke="#e7e5e4"
           strokeWidth={stroke}
           fill="transparent"
           r={normalizedRadius}
@@ -63,10 +61,10 @@ const MetabolicGauge: React.FC<MetabolicGaugeProps> = ({ currentMg, limitMg, sta
       
       {/* Inner Text */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-        <span className="block text-4xl font-bold text-white tracking-tighter" style={{ textShadow: `0 0 20px ${glowColor}`}}>
+        <span className="block text-4xl font-bold text-stone-700 tracking-tighter" style={{ textShadow: `0 0 20px ${glowColor}`}}>
           {Math.round(currentMg)}
         </span>
-        <span className="text-xs text-slate-400 uppercase font-medium">殘留量</span>
+        <span className="text-xs text-stone-500 uppercase font-medium">殘留量</span>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { BrandItem, CaffeineLog } from '../../types';
@@ -28,10 +27,10 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
             <button
                 key={brand.name}
                 onClick={() => setSelectedBrand(brand)}
-                className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-300 text-left hover:border-indigo-500 hover:bg-slate-800 transition flex flex-col justify-center h-24 relative overflow-hidden group"
+                className="p-5 rounded-3xl border border-stone-200 bg-white text-stone-700 text-left hover:border-[#8D6E63] hover:shadow-md transition flex flex-col justify-center h-28 relative overflow-hidden group"
             >
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                <span className="font-bold text-sm relative z-10">{brand.name}</span>
+                <div className="absolute inset-0 bg-[#FFF8F0] opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <span className="font-bold text-sm relative z-10 group-hover:text-[#6F4E37] transition">{brand.name}</span>
             </button>
           ))}
         </div>
@@ -45,24 +44,24 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
       <div className="animate-fade-in">
         <button 
           onClick={() => setSelectedBrand(null)}
-          className="text-xs text-slate-400 mb-4 hover:text-white flex items-center gap-1 transition-colors px-1"
+          className="text-xs text-stone-500 mb-4 hover:text-stone-800 flex items-center gap-1 transition-colors px-1"
         >
           <ChevronLeft size={16} /> 返回品牌列表
         </button>
-        <div className="bg-slate-800/80 rounded-xl border border-slate-700 overflow-hidden">
-          <div className="p-4 border-b border-slate-700 bg-slate-800">
-            <h3 className="text-lg font-bold text-indigo-400">{selectedBrand.name}</h3>
-            <p className="text-xs text-slate-400 mt-1">請選擇飲品項目</p>
+        <div className="bg-white rounded-3xl border border-stone-100 overflow-hidden shadow-sm">
+          <div className="p-5 border-b border-stone-100 bg-stone-50/50">
+            <h3 className="text-lg font-bold text-[#6F4E37]">{selectedBrand.name}</h3>
+            <p className="text-xs text-stone-400 mt-1">請選擇飲品項目</p>
           </div>
-          <div className="divide-y divide-slate-700/50">
+          <div className="divide-y divide-stone-100">
             {selectedBrand.items.map(item => (
               <button
                 key={item.name}
                 onClick={() => setSelectedDrink(item)}
-                className="w-full flex justify-between items-center p-4 hover:bg-slate-700/50 transition text-left group"
+                className="w-full flex justify-between items-center p-5 hover:bg-stone-50 transition text-left group"
               >
-                  <span className="text-sm font-medium text-slate-200 group-hover:text-white transition">{item.name}</span>
-                  <div className="flex items-center text-slate-500 text-xs group-hover:text-indigo-400 transition">
+                  <span className="text-sm font-medium text-stone-700 group-hover:text-[#5D4037] transition">{item.name}</span>
+                  <div className="flex items-center text-stone-400 text-xs group-hover:text-[#8D6E63] transition">
                     <span>選擇容量</span>
                     <ChevronRight size={14} className="ml-1" />
                   </div>
@@ -79,27 +78,27 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
     <div className="animate-fade-in">
       <button 
         onClick={() => setSelectedDrink(null)}
-        className="text-xs text-slate-400 mb-4 hover:text-white flex items-center gap-1 transition-colors px-1"
+        className="text-xs text-stone-500 mb-4 hover:text-stone-800 flex items-center gap-1 transition-colors px-1"
       >
         <ChevronLeft size={16} /> 返回飲品列表
       </button>
-      <div className="bg-slate-800/80 rounded-xl border border-slate-700 overflow-hidden">
-        <div className="p-4 border-b border-slate-700 bg-slate-800">
+      <div className="bg-white rounded-3xl border border-stone-100 overflow-hidden shadow-sm">
+        <div className="p-5 border-b border-stone-100 bg-stone-50/50">
             <div className="flex flex-col">
-              <span className="text-xs text-slate-400 mb-1">{selectedBrand.name}</span>
-              <h3 className="text-lg font-bold text-white">{selectedDrink.name}</h3>
+              <span className="text-xs text-stone-400 mb-1">{selectedBrand.name}</span>
+              <h3 className="text-lg font-bold text-stone-800">{selectedDrink.name}</h3>
             </div>
         </div>
         
-        <div className="p-4 grid gap-4">
+        <div className="p-5 grid gap-5">
             {/* Drink Time */}
             <div>
-              <label className="text-xs text-slate-400 font-bold uppercase block mb-2 ml-1">飲用時間</label>
+              <label className="text-xs text-stone-400 font-bold uppercase block mb-2 ml-1">飲用時間</label>
               <input 
                 type="datetime-local"
                 value={brandDrinkTime}
                 onChange={(e) => setBrandDrinkTime(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-indigo-500 outline-none appearance-none transition-colors"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-stone-800 focus:border-[#8D6E63] outline-none appearance-none transition-colors"
               />
             </div>
 
@@ -109,9 +108,9 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
               onChange={setSelectedSymptoms} 
             />
             
-            <div className="h-px bg-slate-700/50 my-1"></div>
+            <div className="h-px bg-stone-100 my-1"></div>
             
-            <label className="text-xs text-slate-400 font-bold uppercase block ml-1">選擇容量 (點擊即新增)</label>
+            <label className="text-xs text-stone-400 font-bold uppercase block ml-1">選擇容量 (點擊即新增)</label>
             <div className="grid gap-3">
               {selectedDrink.sizes.map(size => (
                 <button
@@ -120,13 +119,13 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
                     const timestamp = new Date(brandDrinkTime).getTime();
                     onAddLog(`${selectedBrand.name} ${selectedDrink.name}`, size.mg, 'brand', timestamp, selectedSymptoms);
                   }}
-                  className="flex items-center justify-between p-4 bg-slate-700/50 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/20 rounded-xl border border-slate-600 hover:border-indigo-400 transition-all duration-300 group"
+                  className="flex items-center justify-between p-4 bg-stone-50 hover:bg-[#6F4E37] hover:shadow-lg hover:shadow-[#6F4E37]/20 rounded-2xl border border-stone-200 hover:border-[#6F4E37] transition-all duration-300 group"
                 >
                   <div className="flex flex-col text-left">
-                    <span className="font-medium text-slate-200 group-hover:text-white">{size.label}</span>
-                    <span className="text-xs text-slate-400 group-hover:text-indigo-200">約 {size.ml} ml</span>
+                    <span className="font-medium text-stone-700 group-hover:text-white">{size.label}</span>
+                    <span className="text-xs text-stone-400 group-hover:text-white/80">約 {size.ml} ml</span>
                   </div>
-                  <span className="font-bold text-indigo-300 group-hover:text-white text-lg">{size.mg} <span className="text-sm font-normal opacity-70">mg</span></span>
+                  <span className="font-bold text-[#8D6E63] group-hover:text-white text-lg">{size.mg} <span className="text-sm font-normal opacity-70">mg</span></span>
                 </button>
               ))}
             </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
 
@@ -85,7 +84,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
-      <div className="min-h-screen bg-slate-900 text-slate-50 p-6 selection:bg-indigo-500/30">
+      <div className="min-h-screen bg-[#FFFBF7] text-stone-800 p-6 selection:bg-orange-200">
         <main className="max-w-md mx-auto relative">
           
           {currentTab === TabView.DASHBOARD && (
