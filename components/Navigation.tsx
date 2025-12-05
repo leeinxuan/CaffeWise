@@ -1,6 +1,6 @@
 import React from 'react';
 import { TabView } from '../types';
-import { Bean, PlusCircle, BarChart2, BookOpen, CalendarDays } from 'lucide-react';
+import { Bean, Plus, BarChart2, BookOpen, CalendarDays } from 'lucide-react';
 
 interface NavigationProps {
   currentTab: TabView;
@@ -11,7 +11,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
   const navItems = [
     { tab: TabView.DASHBOARD, icon: Bean, label: '代謝狀態' },
     { tab: TabView.CALENDAR, icon: CalendarDays, label: '咖啡紀錄' },
-    { tab: TabView.ADD, icon: PlusCircle, label: '紀錄', special: true },
+    { tab: TabView.ADD, icon: Plus, label: '紀錄', special: true },
     { tab: TabView.STATS, icon: BarChart2, label: '統計' },
     { tab: TabView.WIKI, icon: BookOpen, label: '百科' },
   ];
@@ -28,9 +28,11 @@ const Navigation: React.FC<NavigationProps> = ({ currentTab, setTab }) => {
               <button
                 key={item.tab}
                 onClick={() => setTab(item.tab)}
-                className="relative -top-6 bg-[#6F4E37] p-4 rounded-full shadow-xl shadow-[#6F4E37]/40 transform transition active:scale-95 flex items-center justify-center"
+                className="relative -top-6 bg-[#6F4E37] w-14 h-14 rounded-full shadow-lg shadow-[#6F4E37]/40 transform transition active:scale-95 flex items-center justify-center overflow-hidden"
               >
-                <Icon size={28} className="text-white" />
+                {/* Subtle sheen effect */}
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent"></div>
+                <Icon size={28} className="text-white relative z-10" strokeWidth={3} />
               </button>
             );
           }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
+import { AlertTriangle, X, CheckCircle, Info } from 'lucide-react';
 
 import { CaffeineLog, UserSettings, TabView } from './types';
 import { DEFAULT_SETTINGS } from './constants';
@@ -14,6 +15,51 @@ import WikiView from './components/WikiView';
 import SettingsView from './components/SettingsView';
 import CalendarView from './components/CalendarView';
 
+// --- Alert Banner Component ---
+interface AlertBannerProps {
+  isOpen: boolean;
+  type: 'warning' | 'danger';
+  message: string;
+  onClose: () => void;
+}
+
+const AlertBanner: React.FC<AlertBannerProps> = ({ isOpen, type, message, onClose }) => {
+  if (!isOpen) return null;
+
+  const isDanger = type === 'danger';
+
+  // Auto-dismiss logic can be handled here or in parent, doing it here for simplicity
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [isOpen, onClose]);
+
+  return (
+    <div className="fixed top-4 left-4 right-4 z-[100] animate-slide-down">
+      <div className={`rounded-2xl p-4 shadow-lg flex items-start gap-3 ${
+        isDanger ? 'bg-red-500 text-white shadow-red-200' : 'bg-orange-500 text-white shadow-orange-200'
+      }`}>
+        <div className="mt-0.5">
+           {isDanger ? <AlertTriangle size={20} fill="currentColor" className="text-red-600" stroke="white" /> : <Info size={20} />}
+        </div>
+        <div className="flex-1">
+          <h4 className="font-bold text-sm mb-0.5">
+            {isDanger ? '攝取過量警報' : '進入警戒狀態'}
+          </h4>
+          <p className="text-xs opacity-90 leading-relaxed">
+            {message}
+          </p>
+        </div>
+        <button onClick={onClose} className="opacity-70 hover:opacity-100 transition">
+          <X size={18} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // --- Main App Component ---
 
 const App: React.FC = () => {
@@ -22,6 +68,13 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [currentTab, setCurrentTab] = useState<TabView>(TabView.DASHBOARD);
   const [currentLevel, setCurrentLevel] = useState(0);
+
+  // Alert State
+  const [alertState, setAlertState] = useState<{
+    isOpen: boolean;
+    type: 'warning' | 'danger';
+    message: string;
+  }>({ isOpen: false, type: 'warning', message: '' });
 
   // --- Effects ---
 
@@ -73,6 +126,38 @@ const App: React.FC = () => {
       source,
       symptoms: symptoms || []
     };
+
+    // Calculate projected level to trigger alerts
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const now = Date.now();
+    
+    // Recalculate current level freshly to be safe
+    const relevantLogs = logs.filter(log => 
+      log.timestamp >= startOfDay.getTime() && 
+      log.timestamp <= now
+    );
+    const calculatedCurrent = calculateCurrentLevel(relevantLogs, settings.halfLifeHours);
+    
+    // Add the new amount (assuming instant absorption for safety warning)
+    const projectedLevel = calculatedCurrent + amountMg;
+    
+    // Logic for triggering alerts
+    if (projectedLevel > settings.dailyLimitMg) {
+      setAlertState({
+        isOpen: true,
+        type: 'danger',
+        message: `這杯咖啡將使數值達到 ${Math.round(projectedLevel)}mg，已超過每日上限。建議您改喝低咖啡因飲品。`
+      });
+    } else if (projectedLevel > 200 && calculatedCurrent <= 200) {
+       // Only trigger if crossing the threshold
+       setAlertState({
+        isOpen: true,
+        type: 'warning',
+        message: `注意！累積攝取將達 ${Math.round(projectedLevel)}mg。若出現手抖或心悸，請立即停止攝取。`
+      });
+    }
+
     setLogs(prev => [newLog, ...prev]);
     setCurrentTab(TabView.DASHBOARD);
   };
@@ -98,6 +183,14 @@ const App: React.FC = () => {
     <HashRouter>
       <div className="min-h-screen bg-[#FFFBF7] text-stone-800 p-6 selection:bg-orange-200">
         <main className="max-w-md mx-auto relative">
+          
+          {/* Notification Banner */}
+          <AlertBanner 
+            isOpen={alertState.isOpen}
+            type={alertState.type}
+            message={alertState.message}
+            onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+          />
           
           {currentTab === TabView.DASHBOARD && (
             <DashboardView 

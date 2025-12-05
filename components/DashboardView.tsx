@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Coffee, Trash2, Edit2, X, AlertCircle, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Coffee, Trash2, Edit2, X, AlertCircle, Settings, Clock, Scale } from 'lucide-react';
 import { CaffeineLog, UserSettings } from '../types';
 import { SYMPTOMS_LIST } from '../constants';
 import MetabolicGauge from './MetabolicGauge';
@@ -27,7 +27,39 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   onUpdateLog,
   onOpenSettings
 }) => {
-  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  // State for the log currently being edited (full object)
+  const [editingLog, setEditingLog] = useState<CaffeineLog | null>(null);
+  
+  // Form states
+  const [editAmount, setEditAmount] = useState<string>('');
+  const [editTime, setEditTime] = useState<string>('');
+  const [editSymptoms, setEditSymptoms] = useState<string[]>([]);
+
+  // Populate form when a log is selected for editing
+  useEffect(() => {
+    if (editingLog) {
+      setEditAmount(editingLog.amountMg.toString());
+      
+      // Convert timestamp to local datetime string for input[type="datetime-local"]
+      const date = new Date(editingLog.timestamp);
+      const tzOffset = date.getTimezoneOffset() * 60000;
+      const localISOTime = new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+      
+      setEditTime(localISOTime);
+      setEditSymptoms(editingLog.symptoms || []);
+    }
+  }, [editingLog]);
+
+  const handleSaveEdit = () => {
+    if (!editingLog) return;
+    
+    onUpdateLog(editingLog.id, {
+      amountMg: Number(editAmount),
+      timestamp: new Date(editTime).getTime(),
+      symptoms: editSymptoms
+    });
+    setEditingLog(null);
+  };
 
   // Filter logs to show only today's activity
   const todayLogs = logs.filter(log => {
@@ -93,12 +125,15 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="font-bold text-stone-700">{log.name}</div>
                     <div className="text-xs text-stone-400">
                       {new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • 
-                      {log.source === 'brand' ? '品牌資料庫' : log.source === 'manual' ? '手動輸入' : 'AI 辨識'}
+                      {log.source === 'brand' ? '連鎖品牌' : log.source === 'manual' ? '手動輸入' : 'AI 辨識'}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-bold text-[#6F4E37]">{log.amountMg}mg</span>
+                  <button onClick={() => setEditingLog(log)} className="text-stone-300 hover:text-[#8D6E63] transition">
+                    <Edit2 size={16} />
+                  </button>
                   <button onClick={() => onRemoveLog(log.id)} className="text-stone-300 hover:text-red-400 transition">
                     <Trash2 size={16} />
                   </button>
@@ -119,65 +154,92 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                   ) : (
                     <span className="text-[10px] text-stone-400">無不適症狀</span>
                   )}
-                  <button 
-                    onClick={() => setEditingLogId(log.id)}
-                    className="text-[10px] text-[#8D6E63] hover:text-[#6F4E37] bg-[#F5F5F4] hover:bg-[#E7E5E4] px-2 py-0.5 rounded-full ml-auto flex items-center gap-1 transition-colors font-medium"
-                  >
-                    <Edit2 size={10} /> 紀錄反應
-                  </button>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Symptom Editing Modal */}
-      {editingLogId && (
+      {/* Comprehensive Edit Modal */}
+      {editingLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
              <div className="flex justify-between items-center mb-6">
                <h3 className="font-bold text-stone-800 flex items-center gap-2">
-                 <AlertCircle size={20} className="text-[#8D6E63]" />
-                 標記身體反應
+                 <Edit2 size={20} className="text-[#8D6E63]" />
+                 編輯紀錄
                </h3>
-               <button onClick={() => setEditingLogId(null)} className="text-stone-400 hover:text-stone-600">
+               <button onClick={() => setEditingLog(null)} className="text-stone-400 hover:text-stone-600">
                  <X size={20} />
                </button>
              </div>
-             
-             <div className="grid grid-cols-2 gap-3 mb-6">
-                {SYMPTOMS_LIST.map(sym => {
-                  const log = logs.find(l => l.id === editingLogId);
-                  const isActive = log?.symptoms?.includes(sym.id);
-                  return (
-                    <button
-                      key={sym.id}
-                      onClick={() => {
-                        if (!log) return;
-                        const current = log.symptoms || [];
-                        const updated = current.includes(sym.id) 
-                          ? current.filter(id => id !== sym.id)
-                          : [...current, sym.id];
-                        onUpdateLog(log.id, { symptoms: updated });
-                      }}
-                      className={`p-3 rounded-xl border flex items-center justify-center gap-2 text-sm transition-all shadow-sm ${
-                        isActive 
-                          ? 'bg-red-50 border-red-200 text-red-700 font-medium' 
-                          : 'bg-white border-stone-200 text-stone-500 hover:bg-stone-50'
-                      }`}
-                    >
-                      <span>{sym.icon}</span>
-                      <span>{sym.label}</span>
-                    </button>
-                  );
-                })}
+
+             <div className="space-y-4 mb-6">
+                {/* Time Input */}
+                <div>
+                   <label className="text-xs text-stone-400 font-bold uppercase block mb-1.5 ml-1">飲用時間</label>
+                   <div className="relative">
+                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
+                     <input 
+                       type="datetime-local"
+                       value={editTime}
+                       onChange={(e) => setEditTime(e.target.value)}
+                       className="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-10 pr-3 text-stone-800 focus:border-[#8D6E63] outline-none appearance-none"
+                     />
+                   </div>
+                </div>
+
+                {/* Amount Input */}
+                <div>
+                   <label className="text-xs text-stone-400 font-bold uppercase block mb-1.5 ml-1">攝取量 (mg)</label>
+                   <div className="relative">
+                     <Scale className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
+                     <input 
+                       type="number"
+                       value={editAmount}
+                       onChange={(e) => setEditAmount(e.target.value)}
+                       className="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-10 pr-3 text-stone-800 focus:border-[#8D6E63] outline-none font-bold"
+                     />
+                   </div>
+                </div>
+                
+                {/* Symptom Selector */}
+                <div>
+                  <label className="text-xs text-stone-400 font-bold uppercase block mb-2 ml-1 flex items-center gap-1">
+                    <AlertCircle size={12} /> 身體反應
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                      {SYMPTOMS_LIST.map(sym => {
+                        const isActive = editSymptoms.includes(sym.id);
+                        return (
+                          <button
+                            key={sym.id}
+                            onClick={() => {
+                              const updated = isActive
+                                ? editSymptoms.filter(id => id !== sym.id)
+                                : [...editSymptoms, sym.id];
+                              setEditSymptoms(updated);
+                            }}
+                            className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 text-xs transition-all shadow-sm ${
+                              isActive 
+                                ? 'bg-red-50 border-red-200 text-red-700 font-medium' 
+                                : 'bg-white border-stone-200 text-stone-500 hover:bg-stone-50'
+                            }`}
+                          >
+                            <span>{sym.icon}</span>
+                            <span>{sym.label}</span>
+                          </button>
+                        );
+                      })}
+                   </div>
+                </div>
              </div>
              
              <button 
-               onClick={() => setEditingLogId(null)}
+               onClick={handleSaveEdit}
                className="w-full bg-[#6F4E37] text-white py-3.5 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
              >
-               完成
+               儲存變更
              </button>
           </div>
         </div>

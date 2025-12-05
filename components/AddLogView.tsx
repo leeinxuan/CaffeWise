@@ -32,7 +32,7 @@ const AddLogView: React.FC<AddLogViewProps> = ({ onAddLog }) => {
                     <Database size={24} />
                  </div>
                  <div>
-                    <h3 className="text-lg font-bold text-stone-800 mb-1">品牌資料庫</h3>
+                    <h3 className="text-lg font-bold text-stone-800 mb-1">連鎖品牌</h3>
                     <p className="text-sm text-stone-500">內建星巴克、超商咖啡數據，快速選取免查詢。</p>
                  </div>
               </div>
