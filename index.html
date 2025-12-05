@@ -48,6 +48,15 @@
       .animate-slide-down {
         animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
+
+      /* Liquid Wave Animation */
+      @keyframes wave {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-wave {
+        animation: wave 4s linear infinite;
+      }
     </style>
   <script type="importmap">
 {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Coffee, Trash2, Edit2, X, AlertCircle, Settings, Clock, Scale } from 'lucide-react';
+import { Coffee, Trash2, Edit2, X, AlertCircle, Settings, Clock, Scale, ChevronRight } from 'lucide-react';
 import { CaffeineLog, UserSettings } from '../types';
 import { SYMPTOMS_LIST } from '../constants';
 import MetabolicGauge from './MetabolicGauge';
@@ -61,6 +61,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({
     setEditingLog(null);
   };
 
+  const handleDeleteLog = () => {
+    if (!editingLog) return;
+    // Optional: confirm dialog could be added here
+    onRemoveLog(editingLog.id);
+    setEditingLog(null);
+  };
+
   // Filter logs to show only today's activity
   const todayLogs = logs.filter(log => {
     const logDate = new Date(log.timestamp);
@@ -115,47 +122,43 @@ const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-3">
           {todayLogs.length === 0 && <p className="text-stone-400 text-sm italic pl-1">今日尚無紀錄，來杯咖啡嗎？</p>}
           {todayLogs.map(log => (
-            <div key={log.id} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="bg-[#FFF8F0] p-2.5 rounded-full">
-                    <Coffee size={18} className="text-[#8D6E63]" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-stone-700">{log.name}</div>
-                    <div className="text-xs text-stone-400">
-                      {new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • 
-                      {log.source === 'brand' ? '連鎖品牌' : log.source === 'manual' ? '手動輸入' : 'AI 辨識'}
-                    </div>
-                  </div>
+            <button 
+              key={log.id} 
+              onClick={() => setEditingLog(log)}
+              className="w-full bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-between group active:scale-[0.98] transition-all"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <div className="bg-[#FFF8F0] p-2.5 rounded-full">
+                  <Coffee size={18} className="text-[#8D6E63]" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-[#6F4E37]">{log.amountMg}mg</span>
-                  <button onClick={() => setEditingLog(log)} className="text-stone-300 hover:text-[#8D6E63] transition">
-                    <Edit2 size={16} />
-                  </button>
-                  <button onClick={() => onRemoveLog(log.id)} className="text-stone-300 hover:text-red-400 transition">
-                    <Trash2 size={16} />
-                  </button>
+                <div>
+                  <div className="font-bold text-stone-700">{log.name}</div>
+                  <div className="text-xs text-stone-400">
+                    {new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • 
+                    {log.source === 'brand' ? '連鎖品牌' : log.source === 'manual' ? '手動輸入' : 'AI 辨識'}
+                  </div>
+                  
+                  {/* Symptoms Display */}
+                  <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                      {log.symptoms && log.symptoms.length > 0 ? (
+                        log.symptoms.map(sId => {
+                          const s = SYMPTOMS_LIST.find(item => item.id === sId);
+                          return s ? (
+                            <span key={sId} className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100 flex items-center gap-1 font-medium">
+                              {s.icon} {s.label}
+                            </span>
+                          ) : null;
+                        })
+                      ) : null}
+                  </div>
                 </div>
               </div>
               
-              {/* Symptoms Display */}
-              <div className="flex flex-wrap items-center gap-2 ml-12">
-                  {log.symptoms && log.symptoms.length > 0 ? (
-                    log.symptoms.map(sId => {
-                      const s = SYMPTOMS_LIST.find(item => item.id === sId);
-                      return s ? (
-                        <span key={sId} className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100 flex items-center gap-1 font-medium">
-                          {s.icon} {s.label}
-                        </span>
-                      ) : null;
-                    })
-                  ) : (
-                    <span className="text-[10px] text-stone-400">無不適症狀</span>
-                  )}
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-[#6F4E37] text-lg">{log.amountMg}<span className="text-sm font-normal text-stone-400 ml-0.5">mg</span></span>
+                <ChevronRight size={20} className="text-stone-300 group-hover:text-[#8D6E63] transition" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -165,82 +168,96 @@ const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
              <div className="flex justify-between items-center mb-6">
-               <h3 className="font-bold text-stone-800 flex items-center gap-2">
-                 <Edit2 size={20} className="text-[#8D6E63]" />
+               <h3 className="font-bold text-stone-800 flex items-center gap-2 text-xl">
                  編輯紀錄
                </h3>
-               <button onClick={() => setEditingLog(null)} className="text-stone-400 hover:text-stone-600">
-                 <X size={20} />
+               <button onClick={() => setEditingLog(null)} className="p-1 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition">
+                 <X size={24} />
                </button>
              </div>
+            
+             {/* Log Info */}
+             <div className="flex justify-between items-center mb-6 pb-4 border-b border-stone-100">
+                <span className="text-stone-500 font-medium">飲品</span>
+                <span className="text-stone-800 font-bold text-right">{editingLog.name}</span>
+             </div>
 
-             <div className="space-y-4 mb-6">
-                {/* Time Input */}
+             <div className="space-y-5 mb-8">
+                {/* Drinking Time Input - Merged Date/Time */}
                 <div>
-                   <label className="text-xs text-stone-400 font-bold uppercase block mb-1.5 ml-1">飲用時間</label>
-                   <div className="relative">
-                     <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
-                     <input 
-                       type="datetime-local"
-                       value={editTime}
-                       onChange={(e) => setEditTime(e.target.value)}
-                       className="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-10 pr-3 text-stone-800 focus:border-[#8D6E63] outline-none appearance-none"
-                     />
-                   </div>
+                   <label className="text-sm text-stone-500 font-bold block mb-2">飲用時間</label>
+                   <input 
+                     type="datetime-local"
+                     value={editTime}
+                     onChange={(e) => setEditTime(e.target.value)}
+                     className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-stone-800 focus:border-[#8D6E63] outline-none font-bold text-base"
+                   />
                 </div>
 
                 {/* Amount Input */}
                 <div>
-                   <label className="text-xs text-stone-400 font-bold uppercase block mb-1.5 ml-1">攝取量 (mg)</label>
+                   <label className="text-sm text-[#6F4E37] font-bold flex items-center gap-1 mb-2">
+                     <Coffee size={14} /> 咖啡因含量
+                   </label>
                    <div className="relative">
-                     <Scale className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
                      <input 
                        type="number"
                        value={editAmount}
                        onChange={(e) => setEditAmount(e.target.value)}
-                       className="w-full bg-stone-50 border border-stone-200 rounded-xl py-3 pl-10 pr-3 text-stone-800 focus:border-[#8D6E63] outline-none font-bold"
+                       className="w-full bg-white border border-stone-200 rounded-2xl py-3 pl-4 pr-12 text-stone-800 focus:border-[#8D6E63] outline-none font-bold text-xl shadow-sm"
                      />
+                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 font-medium">mg</span>
                    </div>
                 </div>
                 
-                {/* Symptom Selector */}
+                {/* Symptom Selector - Cleaned up */}
                 <div>
-                  <label className="text-xs text-stone-400 font-bold uppercase block mb-2 ml-1 flex items-center gap-1">
-                    <AlertCircle size={12} /> 身體反應
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                      {SYMPTOMS_LIST.map(sym => {
-                        const isActive = editSymptoms.includes(sym.id);
-                        return (
-                          <button
-                            key={sym.id}
-                            onClick={() => {
-                              const updated = isActive
-                                ? editSymptoms.filter(id => id !== sym.id)
-                                : [...editSymptoms, sym.id];
-                              setEditSymptoms(updated);
-                            }}
-                            className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 text-xs transition-all shadow-sm ${
-                              isActive 
-                                ? 'bg-red-50 border-red-200 text-red-700 font-medium' 
-                                : 'bg-white border-stone-200 text-stone-500 hover:bg-stone-50'
-                            }`}
-                          >
-                            <span>{sym.icon}</span>
-                            <span>{sym.label}</span>
-                          </button>
-                        );
-                      })}
+                   <div className="mt-4">
+                      <label className="text-xs text-stone-400 font-bold uppercase block mb-2">身體反應</label>
+                      <div className="grid grid-cols-2 gap-2">
+                          {SYMPTOMS_LIST.map(sym => {
+                            const isActive = editSymptoms.includes(sym.id);
+                            return (
+                              <button
+                                key={sym.id}
+                                onClick={() => {
+                                  const updated = isActive
+                                    ? editSymptoms.filter(id => id !== sym.id)
+                                    : [...editSymptoms, sym.id];
+                                  setEditSymptoms(updated);
+                                }}
+                                className={`p-2 rounded-xl border flex items-center justify-center gap-2 text-xs transition-all ${
+                                  isActive 
+                                    ? 'bg-red-50 border-red-200 text-red-700 font-medium shadow-sm' 
+                                    : 'bg-white border-stone-100 text-stone-400 hover:bg-stone-50'
+                                }`}
+                              >
+                                <span>{sym.icon}</span>
+                                <span>{sym.label}</span>
+                              </button>
+                            );
+                          })}
+                       </div>
                    </div>
                 </div>
              </div>
              
-             <button 
-               onClick={handleSaveEdit}
-               className="w-full bg-[#6F4E37] text-white py-3.5 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
-             >
-               儲存變更
-             </button>
+             <div className="space-y-4">
+                <button 
+                  onClick={handleSaveEdit}
+                  className="w-full bg-[#6F4E37] text-white py-4 rounded-2xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20 text-lg"
+                >
+                  儲存變更
+                </button>
+
+                <button 
+                  onClick={handleDeleteLog}
+                  className="w-full py-2 text-red-400 text-sm font-medium hover:text-red-600 transition flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={16} />
+                  刪除此紀錄...
+                </button>
+             </div>
           </div>
         </div>
       )}

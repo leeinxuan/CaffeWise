@@ -4,7 +4,7 @@ import {
 } from 'recharts';
 import { TrendingUp, Clock, Award, BarChart2, Sparkles, AlertTriangle, Activity } from 'lucide-react';
 import { CaffeineLog } from '../types';
-import { SYMPTOMS_LIST } from '../constants';
+import { SYMPTOMS_LIST, BRAND_DATABASE } from '../constants';
 
 interface StatsViewProps {
   logs: CaffeineLog[];
@@ -139,9 +139,17 @@ const StatsView: React.FC<StatsViewProps> = ({ logs, dailyLimitMg }) => {
   const topDrinks = useMemo(() => {
       const countMap = new Map<string, number>();
       periodLogs.forEach(l => {
-          // Clean up name slightly
-          const cleanName = l.name.split(' ')[0];
-          countMap.set(cleanName, (countMap.get(cleanName) || 0) + 1);
+          let displayName = l.name;
+          
+          // Try to strip brand name to show just the item name for cleaner display
+          if (l.source === 'brand') {
+             const brand = BRAND_DATABASE.find(b => l.name.startsWith(b.name));
+             if (brand) {
+                 displayName = l.name.replace(brand.name, '').trim();
+             }
+          }
+
+          countMap.set(displayName, (countMap.get(displayName) || 0) + 1);
       });
       return Array.from(countMap.entries())
           .sort((a, b) => b[1] - a[1])
