@@ -1,13 +1,16 @@
+
 import React, { useState } from 'react';
+import { Heart } from 'lucide-react';
 import { CaffeineLog } from '../../types';
 import SymptomSelector from './SymptomSelector';
 
 interface AddLogManualProps {
   onAddLog: (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number, symptoms?: string[]) => void;
   onBack: () => void;
+  onSaveFavorite: (name: string, amountMg: number, source: CaffeineLog['source']) => void;
 }
 
-const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog }) => {
+const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog, onSaveFavorite }) => {
   const [manualMode, setManualMode] = useState<'general' | 'formula'>('general');
   const [manualAmount, setManualAmount] = useState('');
   const [manualName, setManualName] = useState('');
@@ -19,6 +22,7 @@ const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog }) => {
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   });
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleManualSubmit = () => {
     const timestamp = new Date(drinkTime).getTime();
@@ -31,6 +35,23 @@ const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog }) => {
     const timestamp = new Date(drinkTime).getTime();
     const name = manualName || '手沖咖啡';
     onAddLog(name, mg, 'manual', timestamp, selectedSymptoms);
+  };
+  
+  const handleSaveGeneralFavorite = () => {
+     if(!manualAmount) return;
+     const name = manualName || (volumeMl ? `飲品 (${volumeMl}ml)` : '手動紀錄');
+     onSaveFavorite(name, Number(manualAmount), 'manual');
+     setIsSaved(true);
+     setTimeout(() => setIsSaved(false), 2000);
+  };
+  
+  const handleSaveFormulaFavorite = () => {
+     if(!beanWeight) return;
+     const mg = Math.round(Number(beanWeight) * Number(caffeinePercentage) * 10);
+     const name = manualName || '手沖咖啡';
+     onSaveFavorite(name, mg, 'manual');
+     setIsSaved(true);
+     setTimeout(() => setIsSaved(false), 2000);
   };
 
   return (
@@ -121,13 +142,25 @@ const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog }) => {
               onChange={setSelectedSymptoms} 
             />
 
-            <button 
-              disabled={!manualAmount}
-              onClick={handleManualSubmit}
-              className="w-full bg-[#6F4E37] disabled:opacity-50 text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
-            >
-              確認新增
-            </button>
+            <div className="flex gap-3 mt-2">
+                <button
+                  disabled={!manualAmount}
+                  onClick={handleSaveGeneralFavorite}
+                  className={`p-4 rounded-xl border transition flex items-center justify-center
+                    ${isSaved ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:text-[#6F4E37] hover:border-[#6F4E37]'}
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+                >
+                  <Heart size={24} fill={isSaved ? "currentColor" : "none"} />
+                </button>
+                <button 
+                  disabled={!manualAmount}
+                  onClick={handleManualSubmit}
+                  className="flex-1 bg-[#6F4E37] disabled:opacity-50 text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
+                >
+                  確認新增
+                </button>
+            </div>
           </div>
         </div>
       )}
@@ -206,13 +239,25 @@ const AddLogManual: React.FC<AddLogManualProps> = ({ onAddLog }) => {
             onChange={setSelectedSymptoms} 
           />
           
-          <button 
-            disabled={!beanWeight}
-            onClick={handleFormulaSubmit}
-            className="w-full bg-[#6F4E37] disabled:opacity-50 text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20 mt-2"
-          >
-            確認新增
-          </button>
+          <div className="flex gap-3 mt-2">
+            <button
+                disabled={!beanWeight}
+                onClick={handleSaveFormulaFavorite}
+                className={`p-4 rounded-xl border transition flex items-center justify-center
+                ${isSaved ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:text-[#6F4E37] hover:border-[#6F4E37]'}
+                disabled:opacity-50 disabled:cursor-not-allowed
+                `}
+            >
+                <Heart size={24} fill={isSaved ? "currentColor" : "none"} />
+            </button>
+            <button 
+                disabled={!beanWeight}
+                onClick={handleFormulaSubmit}
+                className="flex-1 bg-[#6F4E37] disabled:opacity-50 text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
+            >
+                確認新增
+            </button>
+          </div>
         </div>
       )}
     </div>

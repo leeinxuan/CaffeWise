@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
 import { AlertTriangle, X, CheckCircle, Info } from 'lucide-react';
 
-import { CaffeineLog, UserSettings, TabView } from './types';
+import { CaffeineLog, UserSettings, TabView, FavoriteItem } from './types';
 import { DEFAULT_SETTINGS } from './constants';
 import { calculateCurrentLevel, predictClearanceTime } from './utils/caffeineMath';
 
@@ -68,6 +69,11 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [currentTab, setCurrentTab] = useState<TabView>(TabView.DASHBOARD);
   const [currentLevel, setCurrentLevel] = useState(0);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
+  
+  // Gamification State
+  const [beanCount, setBeanCount] = useState(0);
+  const [waterLevel, setWaterLevel] = useState(0); // 0 to 3
 
   // Alert State
   const [alertState, setAlertState] = useState<{
@@ -82,15 +88,25 @@ const App: React.FC = () => {
   useEffect(() => {
     const savedLogs = localStorage.getItem('caffe_logs');
     const savedSettings = localStorage.getItem('caffe_settings');
+    const savedFavorites = localStorage.getItem('caffe_favorites');
+    const savedBeans = localStorage.getItem('caffe_beanCount');
+    const savedWater = localStorage.getItem('caffe_waterLevel');
+    
     if (savedLogs) setLogs(JSON.parse(savedLogs));
     if (savedSettings) setSettings(JSON.parse(savedSettings));
+    if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
+    if (savedBeans) setBeanCount(Number(savedBeans));
+    if (savedWater) setWaterLevel(Number(savedWater));
   }, []);
 
   // Save on Change
   useEffect(() => {
     localStorage.setItem('caffe_logs', JSON.stringify(logs));
     localStorage.setItem('caffe_settings', JSON.stringify(settings));
-  }, [logs, settings]);
+    localStorage.setItem('caffe_favorites', JSON.stringify(favorites));
+    localStorage.setItem('caffe_beanCount', String(beanCount));
+    localStorage.setItem('caffe_waterLevel', String(waterLevel));
+  }, [logs, settings, favorites, beanCount, waterLevel]);
 
   // Update Metabolic Level Timer
   useEffect(() => {
@@ -159,6 +175,10 @@ const App: React.FC = () => {
     }
 
     setLogs(prev => [newLog, ...prev]);
+    
+    // Gamification: Add water (Cap at 3)
+    setWaterLevel(prev => (prev < 3 ? prev + 1 : prev));
+
     setCurrentTab(TabView.DASHBOARD);
   };
 
@@ -168,6 +188,25 @@ const App: React.FC = () => {
 
   const removeLog = (id: string) => {
     setLogs(prev => prev.filter(l => l.id !== id));
+  };
+
+  const addFavorite = (name: string, amountMg: number, source: CaffeineLog['source']) => {
+    const exists = favorites.some(f => f.name === name && f.amountMg === amountMg);
+    if (!exists) {
+      setFavorites(prev => [{ id: Date.now().toString(), name, amountMg, source }, ...prev]);
+    }
+  };
+
+  const removeFavorite = (id: string) => {
+    setFavorites(prev => prev.filter(f => f.id !== id));
+  };
+
+  // Gamification: Harvest
+  const harvestBean = () => {
+    if (waterLevel >= 3) {
+      setBeanCount(prev => prev + 1);
+      setWaterLevel(0);
+    }
   };
 
   // --- Derived Data ---
@@ -209,11 +248,19 @@ const App: React.FC = () => {
             <CalendarView 
               logs={logs}
               onRemoveLog={removeLog}
+              beanCount={beanCount}
+              waterLevel={waterLevel}
+              onHarvest={harvestBean}
             />
           )}
 
           {currentTab === TabView.ADD && (
-            <AddLogView onAddLog={addLog} />
+            <AddLogView 
+              onAddLog={addLog} 
+              favorites={favorites}
+              onAddFavorite={addFavorite}
+              onRemoveFavorite={removeFavorite}
+            />
           )}
 
           {currentTab === TabView.STATS && (

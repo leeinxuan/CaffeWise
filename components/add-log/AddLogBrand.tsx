@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { BrandItem, CaffeineLog } from '../../types';
 import { BRAND_DATABASE } from '../../constants';
 import SymptomSelector from './SymptomSelector';
@@ -7,9 +8,10 @@ import SymptomSelector from './SymptomSelector';
 interface AddLogBrandProps {
   onAddLog: (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number, symptoms?: string[]) => void;
   onBack: () => void;
+  onSaveFavorite: (name: string, amountMg: number, source: CaffeineLog['source']) => void;
 }
 
-const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
+const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack, onSaveFavorite }) => {
   const [selectedBrand, setSelectedBrand] = useState<BrandItem | null>(null);
   const [selectedDrink, setSelectedDrink] = useState<BrandItem['items'][0] | null>(null);
   const [selectedSize, setSelectedSize] = useState<{ label: string; mg: number; ml: number } | null>(null);
@@ -19,6 +21,7 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   });
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [isSaved, setIsSaved] = useState(false);
 
   // Helper to handle adding the log
   const handleConfirmAdd = () => {
@@ -32,6 +35,17 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
       timestamp, 
       selectedSymptoms
     );
+  };
+  
+  const handleSaveFavorite = () => {
+    if (!selectedBrand || !selectedDrink || !selectedSize) return;
+    onSaveFavorite(
+      `${selectedBrand.name} ${selectedDrink.name}`, 
+      selectedSize.mg, 
+      'brand'
+    );
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
   };
 
   // Level 1: Brand Selection
@@ -155,14 +169,27 @@ const AddLogBrand: React.FC<AddLogBrandProps> = ({ onAddLog, onBack }) => {
               })}
             </div>
             
-            {/* Confirm Button */}
-            <button 
-              disabled={!selectedSize}
-              onClick={handleConfirmAdd}
-              className="w-full bg-[#6F4E37] disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20 mt-2"
-            >
-              確認新增
-            </button>
+            <div className="flex gap-3 mt-2">
+               <button
+                  disabled={!selectedSize}
+                  onClick={handleSaveFavorite}
+                  className={`p-4 rounded-xl border transition flex items-center justify-center
+                    ${isSaved ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:text-[#6F4E37] hover:border-[#6F4E37]'}
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+               >
+                  <Heart size={24} fill={isSaved ? "currentColor" : "none"} />
+               </button>
+               
+               {/* Confirm Button */}
+               <button 
+                 disabled={!selectedSize}
+                 onClick={handleConfirmAdd}
+                 className="flex-1 bg-[#6F4E37] disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"
+               >
+                 確認新增
+               </button>
+            </div>
         </div>
       </div>
     </div>

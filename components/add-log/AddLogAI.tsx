@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Zap, Camera } from 'lucide-react';
+import { Zap, Camera, Heart } from 'lucide-react';
 import { CaffeineLog } from '../../types';
 import { analyzeImageForCaffeine } from '../../services/geminiService';
 import SymptomSelector from './SymptomSelector';
@@ -7,12 +8,14 @@ import SymptomSelector from './SymptomSelector';
 interface AddLogAIProps {
   onAddLog: (name: string, amountMg: number, source: CaffeineLog['source'], customTimestamp?: number, symptoms?: string[]) => void;
   onBack: () => void;
+  onSaveFavorite: (name: string, amountMg: number, source: CaffeineLog['source']) => void;
 }
 
-const AddLogAI: React.FC<AddLogAIProps> = ({ onAddLog }) => {
+const AddLogAI: React.FC<AddLogAIProps> = ({ onAddLog, onSaveFavorite }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -29,6 +32,13 @@ const AddLogAI: React.FC<AddLogAIProps> = ({ onAddLog }) => {
       setIsScanning(false);
     };
     reader.readAsDataURL(file);
+  };
+  
+  const handleSaveFavorite = () => {
+    if (!scanResult) return;
+    onSaveFavorite(scanResult.drinkName, scanResult.estimatedMg, 'ai');
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
   };
 
   return (
@@ -79,6 +89,16 @@ const AddLogAI: React.FC<AddLogAIProps> = ({ onAddLog }) => {
               >
                 重試
               </button>
+
+              <button
+                  onClick={handleSaveFavorite}
+                  className={`p-3 rounded-xl border transition flex items-center justify-center
+                  ${isSaved ? 'bg-red-50 border-red-200 text-red-500' : 'bg-white border-stone-200 text-stone-400 hover:text-[#6F4E37] hover:border-[#6F4E37]'}
+                  `}
+              >
+                  <Heart size={24} fill={isSaved ? "currentColor" : "none"} />
+              </button>
+
               <button 
                 onClick={() => onAddLog(scanResult.drinkName, scanResult.estimatedMg, 'ai', undefined, selectedSymptoms)}
                 className="flex-1 py-3 text-sm font-bold text-white bg-[#6F4E37] rounded-xl hover:bg-[#5D4037] transition shadow-lg shadow-[#6F4E37]/20"

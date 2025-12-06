@@ -8,6 +8,13 @@ export interface CaffeineLog {
   symptoms?: string[];
 }
 
+export interface FavoriteItem {
+  id: string;
+  name: string;
+  amountMg: number;
+  source: 'manual' | 'brand' | 'ai';
+}
+
 export interface UserSettings {
   dailyLimitMg: number;
   halfLifeHours: number; // e.g., 3 (fast), 5 (avg), 7 (slow)
