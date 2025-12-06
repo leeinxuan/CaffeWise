@@ -74,6 +74,7 @@ const App: React.FC = () => {
   // Gamification State
   const [beanCount, setBeanCount] = useState(0);
   const [waterLevel, setWaterLevel] = useState(0); // 0 to 3
+  const [unlockedRecipes, setUnlockedRecipes] = useState<number[]>([]); // Array of Recipe IDs
 
   // Alert State
   const [alertState, setAlertState] = useState<{
@@ -91,12 +92,14 @@ const App: React.FC = () => {
     const savedFavorites = localStorage.getItem('caffe_favorites');
     const savedBeans = localStorage.getItem('caffe_beanCount');
     const savedWater = localStorage.getItem('caffe_waterLevel');
+    const savedRecipes = localStorage.getItem('caffe_unlockedRecipes');
     
     if (savedLogs) setLogs(JSON.parse(savedLogs));
     if (savedSettings) setSettings(JSON.parse(savedSettings));
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
     if (savedBeans) setBeanCount(Number(savedBeans));
     if (savedWater) setWaterLevel(Number(savedWater));
+    if (savedRecipes) setUnlockedRecipes(JSON.parse(savedRecipes));
   }, []);
 
   // Save on Change
@@ -106,7 +109,8 @@ const App: React.FC = () => {
     localStorage.setItem('caffe_favorites', JSON.stringify(favorites));
     localStorage.setItem('caffe_beanCount', String(beanCount));
     localStorage.setItem('caffe_waterLevel', String(waterLevel));
-  }, [logs, settings, favorites, beanCount, waterLevel]);
+    localStorage.setItem('caffe_unlockedRecipes', JSON.stringify(unlockedRecipes));
+  }, [logs, settings, favorites, beanCount, waterLevel, unlockedRecipes]);
 
   // Update Metabolic Level Timer
   useEffect(() => {
@@ -209,6 +213,14 @@ const App: React.FC = () => {
     }
   };
 
+  // Gamification: Unlock Recipe
+  const unlockRecipe = (recipeId: number, cost: number) => {
+    if (beanCount >= cost && !unlockedRecipes.includes(recipeId)) {
+      setBeanCount(prev => prev - cost);
+      setUnlockedRecipes(prev => [...prev, recipeId]);
+    }
+  };
+
   // --- Derived Data ---
   const sleepClearTime = predictClearanceTime(currentLevel, settings.sleepThresholdMg, settings.halfLifeHours);
   
@@ -251,6 +263,8 @@ const App: React.FC = () => {
               beanCount={beanCount}
               waterLevel={waterLevel}
               onHarvest={harvestBean}
+              unlockedRecipes={unlockedRecipes}
+              onUnlockRecipe={unlockRecipe}
             />
           )}
 

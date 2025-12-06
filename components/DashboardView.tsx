@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Coffee, Trash2, Edit2, X, AlertCircle, Settings, Clock, Scale, ChevronRight } from 'lucide-react';
 import { CaffeineLog, UserSettings } from '../types';
 import { SYMPTOMS_LIST } from '../constants';
@@ -164,9 +165,9 @@ const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Comprehensive Edit Modal */}
-      {editingLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+      {editingLog && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setEditingLog(null)}>
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
              <div className="flex justify-between items-center mb-6">
                <h3 className="font-bold text-stone-800 flex items-center gap-2 text-xl">
                  編輯紀錄
@@ -259,7 +260,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                 </button>
              </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
