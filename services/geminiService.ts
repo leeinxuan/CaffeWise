@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 export const analyzeImageForCaffeine = async (base64Image: string, mimeType: string = 'image/jpeg'): Promise<AIAnalysisResult> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image', // Using efficient model for image tasks
+      model: 'gemini-2.5-flash', // Using efficient model for multimodal tasks which supports JSON mode
       contents: {
         parts: [
           {
