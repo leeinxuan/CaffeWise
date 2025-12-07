@@ -32,7 +32,7 @@ const CoffeeGarden: React.FC<CoffeeGardenProps> = ({ waterLevel, onHarvest }) =>
       return (
         <div className="relative mt-4 animate-fade-in flex flex-col items-center justify-end h-32">
            {/* Plant Container */}
-           <div className="relative z-0 mb-[-5px] animate-[wave_3s_ease-in-out_infinite] origin-bottom">
+           <div className="relative z-0 mb-[-5px] origin-bottom">
               {/* Stem */}
               <div className="w-2 h-10 bg-gradient-to-r from-lime-300 to-lime-500 mx-auto rounded-full"></div>
               {/* Tiny Leaves */}
@@ -40,14 +40,14 @@ const CoffeeGarden: React.FC<CoffeeGardenProps> = ({ waterLevel, onHarvest }) =>
               <div className="absolute top-1 left-1/2 w-2 h-2 bg-gradient-to-bl from-lime-300 to-green-500 rounded-tr-full rounded-bl-full shadow-sm"></div>
            </div>
            <Soil />
-           <p className="text-xs text-stone-400 mt-2 text-center font-medium">發芽中 (1/3)</p>
+           <p className="text-xs text-stone-400 mt-2 text-center font-medium">發芽中</p>
         </div>
       );
     } else if (waterLevel === 2) {
       return (
         <div className="relative mt-2 animate-fade-in flex flex-col items-center justify-end h-32">
            {/* Plant Container */}
-           <div className="relative z-0 mb-[-5px] animate-[wave_4s_ease-in-out_infinite] origin-bottom">
+           <div className="relative z-0 mb-[-5px] origin-bottom">
                {/* Stem */}
                <div className="w-2.5 h-16 bg-gradient-to-r from-lime-300 to-lime-600 mx-auto rounded-full"></div>
                
@@ -62,14 +62,14 @@ const CoffeeGarden: React.FC<CoffeeGardenProps> = ({ waterLevel, onHarvest }) =>
                </div>
            </div>
            <Soil />
-           <p className="text-xs text-stone-400 mt-2 text-center font-medium">成長中 (2/3)</p>
+           <p className="text-xs text-stone-400 mt-2 text-center font-medium">成長中</p>
         </div>
       );
     } else {
       return (
         <div className="relative mt-0 animate-fade-in group cursor-pointer flex flex-col items-center justify-end h-32" onClick={onHarvest}>
            {/* Plant Container */}
-           <div className="relative z-0 mb-[-5px] animate-[wave_5s_ease-in-out_infinite] origin-bottom">
+           <div className="relative z-0 mb-[-5px] origin-bottom">
                {/* Stem */}
                <div className="w-3 h-20 bg-gradient-to-r from-green-400 to-green-700 mx-auto rounded-full"></div>
                
@@ -86,7 +86,7 @@ const CoffeeGarden: React.FC<CoffeeGardenProps> = ({ waterLevel, onHarvest }) =>
            <Soil />
            
            <button className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#6F4E37] text-white text-xs px-4 py-1.5 rounded-full shadow-xl font-bold animate-pulse hover:scale-110 transition z-20 border-2 border-white/20">
-             點擊採收！
+             採收
            </button>
         </div>
       );

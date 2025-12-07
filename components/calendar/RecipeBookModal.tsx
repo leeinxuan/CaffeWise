@@ -18,7 +18,7 @@ const RECIPES = [
     name: "經典提拉米蘇", 
     cost: 3, 
     desc: "義大利國寶級甜點，手指餅乾吸飽濃縮咖啡與酒香，馬斯卡彭起司帶來濃郁口感。", 
-    image: "/img/tiramisu.png",
+    image: "https://i.meee.com.tw/Z455Y4c.png",
     fallbackImage: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=800&auto=format&fit=crop"
   },
   { 
@@ -26,21 +26,21 @@ const RECIPES = [
     name: "焦糖阿法奇朵", 
     cost: 6, 
     desc: "熱騰騰的 Espresso 澆淋在香草冰淇淋上，冰火交融的極致享受。", 
-    image: "https://images.unsplash.com/photo-1594488518868-245c479383b4?q=80&w=800&auto=format&fit=crop"
+    image: "https://i.meee.com.tw/OfG4Sye.png"
   },
   { 
     id: 3, 
     name: "日式草莓鮮奶油蛋糕", 
     cost: 10, 
     desc: "蓬鬆的海綿蛋糕夾著新鮮草莓與輕盈鮮奶油，酸甜適中，最適合搭配淺焙咖啡。", 
-    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=800&auto=format&fit=crop"
+    image: "https://i.meee.com.tw/WhWNIpv.png"
   },
   { 
     id: 4, 
     name: "濃郁布朗尼", 
     cost: 15, 
     desc: "外層酥脆、內心濕潤的巧克力布朗尼，加入核桃增加口感層次。", 
-    image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476d?q=80&w=800&auto=format&fit=crop"
+    image: "https://i.meee.com.tw/exX2ofH.png"
   },
 ];
 
